@@ -6,7 +6,6 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 import utils
-import subprocess
 import llm_chains
 import schema
 import json
