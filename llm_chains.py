@@ -23,15 +23,19 @@ from langsmith.wrappers import wrap_openai
 from langsmith import traceable
 import openai
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
-
+from langchain_groq import ChatGroq
 
 # llm model
-llm = ChatOpenAI(temperature=0, model="gpt-4")
-
+#llm = ChatOpenAI(temperature=0, model="gpt-4")
+llm = ChatGroq(
+    temperature=0,
+    model="llama3-70b-8192"
+)
 
 #### TAGGING CHAINS; take a schema return a tagging chain model
 # ref_tag_chain = create_tagging_chain_pydantic(schema.ReflectionSchema, ChatOpenAI(temperature=0, model="gpt-4"))
-proj_tag_chain = create_tagging_chain_pydantic(schema.ProjectSchema, ChatOpenAI(temperature=0, model="gpt-4"))
+#proj_tag_chain = create_tagging_chain_pydantic(schema.ProjectSchema, ChatOpenAI(temperature=0, model="gpt-4"))
+proj_tag_chain = create_tagging_chain_pydantic(schema.ProjectSchema, llm)
 
 
 # (V1) prommt for formulating questions to checkin in with students 
@@ -49,7 +53,9 @@ proj_tag_chain = create_tagging_chain_pydantic(schema.ProjectSchema, ChatOpenAI(
 
 
 
-checkin_model = ChatOpenAI(temperature=0, model="gpt-4")
+#checkin_model = ChatOpenAI(temperature=0, model="gpt-4")
+checkin_model = llm
+
 
 # prommt for formulating questions to help students provide information on project 
 proj_quesion_prompt = """ You are an experienced entrepreneurship coach. You are coaching users by asking them reflective questions to help them articulate their project details.

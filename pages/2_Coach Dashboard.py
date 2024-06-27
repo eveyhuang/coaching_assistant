@@ -42,7 +42,7 @@ risk_df = utils.format_risk_framework(risk_framework)
 
 stu_dia_data = load_data('coaching_agenda')
 stu_dia_df = utils.format_stu_diagnosis(stu_dia_data)
-print("retrieved student diagnosis data:     ", stu_dia_df)
+# print("retrieved student diagnosis data:     ", stu_dia_df)
 
 dynamic_filters = DynamicFilters(reflection_df, filters = ['full_name', 'date'])
 
@@ -56,7 +56,7 @@ sel_stu = filtered_ref_df.iloc[0]['full_name']
 sel_date = filtered_ref_df.iloc[0]['date']
 filtered_dia_df = diagnosis_df[(diagnosis_df['full_name']==sel_stu) & (diagnosis_df['date']==sel_date)]
 filt_stu_dia_df = stu_dia_df[(stu_dia_df['full_name']==sel_stu) & (stu_dia_df['date']==sel_date)]
-print("filtered student diagnosis data with name: ", sel_stu, "; Date:   ", sel_date, ":   ", filt_stu_dia_df)
+# print("filtered student diagnosis data with name: ", sel_stu, "; Date:   ", sel_date, ":   ", filt_stu_dia_df)
 # section for student and project information
 
 st.markdown('### ' + sel_stu)
