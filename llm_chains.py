@@ -26,35 +26,28 @@ from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain_groq import ChatGroq
 
 # llm model
-#llm = ChatOpenAI(temperature=0, model="gpt-4")
+tag_llm = ChatOpenAI(temperature=0, model="gpt-4o")
 llm = ChatGroq(
     temperature=0,
     model="llama3-70b-8192"
 )
+checkin_model = llm
 
 #### TAGGING CHAINS; take a schema return a tagging chain model
 # ref_tag_chain = create_tagging_chain_pydantic(schema.ReflectionSchema, ChatOpenAI(temperature=0, model="gpt-4"))
 #proj_tag_chain = create_tagging_chain_pydantic(schema.ProjectSchema, ChatOpenAI(temperature=0, model="gpt-4"))
-proj_tag_chain = create_tagging_chain_pydantic(schema.ProjectSchema, llm)
+tagging_template = """ Extract the desired information about the user from the following conversation between an assistant and the user below.
+                    Only extracts the properties mentioned in the 'information_extraction' function. 
+                    Extract as many relevant propertisesas as possible at once, but do NOT make up any information.     
+                        
+                    Conversation:
+                    {input}
+                    """
 
-
-# (V1) prommt for formulating questions to checkin in with students 
-# ref_quesion_prompt = """ You are a coaching assistant who ask users reflective questions to help them reflect on their progress.
-#     Formulate a question in a friendly and supportive tone about an item: {item}, based on its description: {description}. An example will be {example}.
-#     If the item is "progress", you should remind the user what his previous goal was from your last check in ({previous_goal}).
-#     However, if previous goal ({previous_goal}) is not available, you should ask the user to remind you what was the goal they set for themselves to work on last week. 
-#     You should only ask about {item}, ask one question at a time. 
-#     Do not make up any answers for the human. Wait for them to respond.
-    
-#     History of conversation: {history}
-#     User: {human_input}
-#     Assistant: 
-# """
+proj_tag_chain = create_tagging_chain_pydantic(pydantic_schema=schema.ProjectSchema, llm=tag_llm, prompt= ChatPromptTemplate.from_template(tagging_template))
 
 
 
-#checkin_model = ChatOpenAI(temperature=0, model="gpt-4")
-checkin_model = llm
 
 
 # prommt for formulating questions to help students provide information on project 
@@ -71,16 +64,6 @@ proj_quesion_prompt = """ You are an experienced entrepreneurship coach. You are
 
 question_prompt = ChatPromptTemplate.from_template(proj_quesion_prompt)
 proj_question_chain = question_prompt | checkin_model | StrOutputParser()
-
-
-# checkin_chains = {
-#     "project": proj_chain,
-#     "reflections": ref_chain
-# }
-
-# return the llm chain to formulate checkin questions based on mode (reflection or project)
-# def getCheckinChain(mode):
-#     return checkin_chains[mode]
 
 
 
@@ -188,6 +171,7 @@ prompt = PromptTemplate(
         assumptions and help them identify possible risks that may make their products fail. 
         Given the user (who is a novice entrepreneur) input below, and a list of common risks: {risk}
         Use each of the risk to evaluate user input and diganose the top three risks that are most relevant to the input, might be present, and might occur in the near future. Explain your reasoning on your diagnosis. 
+        if the risk you identified is about having risky asusmptions that are either not identified or validated, include a possible risky assumption in your reasoning. 
         structure your output into json format using these keys: diagnosed_risks, reasoning_for_risks, questions_to_ask. follow format instruction: \n{format_instructions}
 
 <input>
@@ -205,10 +189,10 @@ diagnose_chain = prompt | llm | output_parser
 # LLM chain for diagnosis
 diag_qa_chain = (
     PromptTemplate.from_template(
-        """You are a helpful thought partner that asks users reflective questions to help them articulate thinking and realize possible risk in their project. 
-        In a coherent setence, tell the user the potential risk you have identifed: {risk} 
-        and ask this question: {question} in friendly and supportive tone. 
-        make sure the question is tailored to the context in the history.
+        """You are an expert entrepreneurship coach that asks users reflective questions to help them articulate thinking and realize possible risk in their project. 
+        In one concise and coherent setence and in friendly and supportive tone, tell the user the potential risk you have identifed: {risk}. and ask this question: {question} 
+        make sure the question is tailored to the context in the history. 
+        Only return the sentence about the risk and the question you have generated.
 
     History of conversation: {history}
     User: {human_input}

@@ -48,8 +48,13 @@ proj_question_chain = llm_chains.proj_question_chain
 
 # run LLM to formulate a question
 def ask_for_info(chain, history, human_input, previous_goal, item, description, example):
-    question = chain.invoke({"history": history, "human_input":human_input, "previous_goal":previous_goal, "item": item, "description": description, "example":example})
-    return question
+    try:
+        question = chain.invoke({"history": history, "human_input":human_input, "previous_goal":previous_goal, "item": item, "description": description, "example":example})
+        return question
+    except:
+        print("Encountered errors when asking about ", item)
+        print("history  : ", history)
+        return example
 
 # based on tagged data check what items are left to ask
 def check_what_is_empty(user_peronal_details):
