@@ -36,17 +36,16 @@ checkin_model = llm
 #### TAGGING CHAINS; take a schema return a tagging chain model
 # ref_tag_chain = create_tagging_chain_pydantic(schema.ReflectionSchema, ChatOpenAI(temperature=0, model="gpt-4"))
 #proj_tag_chain = create_tagging_chain_pydantic(schema.ProjectSchema, ChatOpenAI(temperature=0, model="gpt-4"))
-tagging_template = """ Extract the desired information about the user from the following conversation between an assistant and the user below.
-                    Only extracts the properties mentioned in the 'information_extraction' function. 
-                    Extract as many relevant propertisesas as possible at once, but do NOT make up any information.     
-                        
+
+tagging_template = """ Extract the desired information about the user from the following conversation between an assistant and the user in the input below.
+                    Use the question asked by the assistant as context, extract properties that match the descriptions closely in the 'information_extraction' function from user's response.
+                    Extract as many relevant properties as possible at once, but do NOT make up any information.     
+                    When extracting properties, rephrase and summarize it into short and coherent sentences and fix any typos or grammar errors.  
                     Conversation:
                     {input}
                     """
 
 proj_tag_chain = create_tagging_chain_pydantic(pydantic_schema=schema.ProjectSchema, llm=tag_llm, prompt= ChatPromptTemplate.from_template(tagging_template))
-
-
 
 
 
@@ -67,16 +66,14 @@ proj_question_chain = question_prompt | checkin_model | StrOutputParser()
 
 
 
-# Prompt for summarizing check-in for coaches
+# Prompt for summarizing 
 
-summary_prompt_template = """ You are a helpful assistant that extracts and summarizes information about the user's venture by 
-    generating an accurate and concise summary of a conversation that is provided between the following `information` json blocks.
-    In your summaries, refer to the user with only first name.  Do not make up any information that is not in the provided `information` json blocks. 
-    Start your summary by saying that this is the recap of what the user has told you today and asks the user to confirm whether your summary is accurate at the end.
-    <checkin>
-        {information} 
-    <checkin/>
-
+summary_prompt_template = """ You are a helpful assistant that summarizes all the content in the `information` blocks into a single, less-than-30-word sentence.
+    Do not make up any information that is not provided. 
+    Replace reference to the user with only the first name in user's full name: {name}
+    
+    Information:
+    {information} 
     Assistant: 
 """
 
@@ -190,9 +187,11 @@ diagnose_chain = prompt | llm | output_parser
 diag_qa_chain = (
     PromptTemplate.from_template(
         """You are an expert entrepreneurship coach that asks users reflective questions to help them articulate thinking and realize possible risk in their project. 
-        In one concise and coherent setence and in friendly and supportive tone, tell the user the potential risk you have identifed: {risk}. and ask this question: {question} 
+        If there is an unanswered question from the user in the history, briefly responds to it with a hint, but tell the user to get hel from the coach in person.
+        Then, in one concise and coherent setence, tell the user the potential risk you have identifed: {risk}. and ask this question: {question} 
         make sure the question is tailored to the context in the history. 
-        Only return the sentence about the risk and the question you have generated.
+        Keep your whole response short (less than 50 words), and in friendly, and supportive tone.
+        Only output the requested content.
 
     History of conversation: {history}
     User: {human_input}

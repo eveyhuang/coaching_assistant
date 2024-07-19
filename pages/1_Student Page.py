@@ -59,7 +59,7 @@ st.markdown('### ' + sel_stu)
 
 
 # section to display the most recent reflection
-st.markdown("#### Check-in")
+st.markdown("#### Summary of your project info")
 ref_toshow = filtered_ref_df.iloc[:1][['project_information', 'process', 'learning', 'obstacles', 'planning', 'emotions']].copy()
 ref_toshow = ref_toshow.T
 ref_toshow.columns=['information']
@@ -69,8 +69,9 @@ st.table(ref_toshow)
 # section to show diagnosis 
 st.markdown("#### Diagnosis")
 
-st.markdown('##### Top 3 Risks diagnosed by system', help = 'Pick the risks that you think might be relevant to get help from your coach.')
+st.markdown('##### Top 3 Risks diagnosed by system')
 # st.table(filtered_dia_df)
+st.markdown('Pick and click on risks that you would like to discuss and get help from your coach.')
 list_diagnosed_risks = list(filtered_dia_df.columns)
 list_all_risks = list(risk_df.columns)
 
@@ -101,7 +102,6 @@ for label, tab in zip(tab_labels, tabs):
 
 st.markdown('##### Other risks to consider', help='Pick the risks that you think might be relevant to get help from your coach.')
 
-
 for col in list_all_risks:
     if col not in list_diagnosed_risks:
         st.checkbox(":gray[ "+ col + ": " + risk_df.iloc[0][col] + ']', key=col)
@@ -120,7 +120,7 @@ for risk in list_all_risks:
             risk_to_disucss[risk]= risk_df.iloc[0][risk]
 with st.form('additional_risk'):
     
-    stu_risk = st.text_input("Add additional risks or items that you would like to discuss with your coach:", "")
+    stu_risk = st.text_input("Write down additional risks, notes, or anything else that you would like to discuss with your coach below:", "")
     submitted = st.form_submit_button("Submit")
     if submitted:
         risk_to_disucss['student_submitted'] = stu_risk

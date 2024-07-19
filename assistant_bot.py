@@ -68,19 +68,47 @@ def check_what_is_empty(user_peronal_details):
 # add newly answered details into Reflection schema
 def add_non_empty_details(current_details: schema.ProjectSchema, new_details: schema.ProjectSchema):
     non_empty_details = {k: v for k, v in new_details.dict().items() if v not in [None, "", False]}
-    updated_details = current_details.copy(update=non_empty_details)
-    return updated_details
+    # updated_details = current_details.copy(update=non_empty_details)
+    copied = current_details.copy() 
+    for k, v in new_details.dict().items():
+        if v not in [None, "", False]:
+            if k in current_details.dict().keys():
+                if copied.__dict__[k] in [None, "", False]:
+                    copied.__dict__[k] = v
+                elif v not in copied.__dict__[k]:
+                    print("UPDATE: adding to [ " + k + " ] with: [ " + v + " ]")
+                    copied.__dict__[k] += " " + v
+    # updated_details = current_details
+    return copied
 
 # use tagging chain to fill in ReflectionDetails schema
 def filter_response(tagging_chain, text_input, user_details):
     # print("Tagging input: ", text_input)
     # print("Old user details: ", user_details)
-    res = tagging_chain.run(text_input)
-    print("after tagging: ", res)
-    user_details = add_non_empty_details(user_details, res)
-    ask_for = check_what_is_empty(user_details)
-    print("ask for: ", ask_for)
-    return user_details, ask_for
+    try:
+        res = tagging_chain.run(text_input)
+        # print("**  after tagging: ", res)
+        user_details = add_non_empty_details(user_details, res)
+
+        print("**** Newest user detail: ", user_details)
+        ask_for = check_what_is_empty(user_details)
+        print("ask for: ", ask_for)
+        return user_details, ask_for
+    except:
+        print("encountered errors while trying to tag input")
+        return st.session_state.details, st.session_state.ask_for
+
+# summarize data in user details
+def summarize_all_details(user_details):
+    name = ''
+    copied = user_details.copy() 
+    for k, v in user_details.dict().items():
+        if k == 'full_name':
+            name = copied.__dict__[k]
+        else:
+            copied.__dict__[k] = llm_chains.summary_chain.invoke({"information": v, "name": name})
+    # updated_details = current_details
+    return copied 
 
 # return name in propper format
 def format_name(name):
@@ -202,7 +230,7 @@ if answer := st.chat_input("Please type your response here. "):
         # monitoring stage; ask monitoring questions based on st.session_state.ask_for
         if st.session_state.mode == 'monitor':    
             
-            st.session_state.details, st.session_state.ask_for = filter_response(tagging_chain, st.session_state.messages, st.session_state.details)
+            st.session_state.details, st.session_state.ask_for = filter_response(tagging_chain, st.session_state.messages[-2:], st.session_state.details)
             if st.session_state.ask_for != []:
                 question_dict = checkin_schemas[st.session_state.mode][1]
                 question_chain = proj_question_chain
@@ -235,7 +263,7 @@ if answer := st.chat_input("Please type your response here. "):
                 st.session_state.last_risk = risk
                 reason_qs = st.session_state.diagnosis_library[risk]
                 print("next risk to ask about: ", risk, reason_qs)
-                next_question = llm_chains.diag_qa_chain.invoke({ "question": reason_qs[1], "risk": reason_qs[0], "history":st.session_state.messages[-3:], "human_input": answer})  
+                next_question = llm_chains.diag_qa_chain.invoke({ "question": reason_qs[1], "risk": reason_qs[0], "history":st.session_state.messages[-2:], "human_input": answer})  
                 assistant_response = next_question
                 st.session_state.risks.pop(0)
 
@@ -248,22 +276,20 @@ if answer := st.chat_input("Please type your response here. "):
                 
 
                 # save students' check-in and diagnosis to db
-                final_details = st.session_state.details.dict()
+                st.session_state.details, st.session_state.ask_for = filter_response(tagging_chain, st.session_state.messages[-6:], st.session_state.details)
+                
+                final_details = summarize_all_details(st.session_state.details)
+                final_details = final_details.dict()
+                
                 savedata(final_details, st.session_state.diagnosis_library, 'diagnosis')
-            
                 savedata(final_details, final_details, 'check_in')
-
+                savedata(st.session_state.details.dict(), st.session_state.details.dict(), 'check_in_original' )
                 savedata(final_details, st.session_state.messages, 'log')
         
         else:
             assistant_response = """Thank you for answering all of my questions.
                                  """
-            
-            # after students are done checking in, produce a summary of students' response and save 
-            # summary_schema = schema.CoachingSchema
-            # summary_chain = llm_chains.summary_chain
-            # coaching_output = summary_chain.invoke({"information": final_details})
-            # savedata(coaching_output.dict(), 'coaching_log', st.session_state.mode)
+        
             
         for chunk in assistant_response.split():
             full_response += chunk + " "

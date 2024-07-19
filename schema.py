@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, conlist
+from pydantic import BaseModel, Field
 from typing import Optional
 
 
@@ -6,9 +6,9 @@ from typing import Optional
 
 #dictionary of areas that the LLM model should ask about
 proj_Questions = {
-    'project_information': ["information about student's most recent understanding and approach in their project, such as intended users and their needs, and students' proposed solution to solve those needs.", 
-                "In a few sentences, could you please tell me aboout your project. Who are your targeted users, what are their needs, and what is your proposed product to solve that need?"],
-    'process':["actions students have taken to make progress in the past two weeks, such as testing, fund-raising activities, building prototypes, etc.", 
+    'project_information': ["The most updated, current information about a student's venture, such as the problem the venture aims to solve, and students' proposed solution to solve that problem.", 
+                "How about let's start by telling me a little about what your venture is about and what has been going on in the past few weeks? I know things probably have changed quite a bit since you first started, so just tell me your most current version."],
+    'process':["the most recent updates that the student has on the venture; including actions they are taking right now, goals they are trying to achieve right now.  Includes testing, fund-raising activities, building prototypes, etc.", 
                "Can you tell me what you have been working on for the past few weeks to make progress on your project?"],
     'learning':["Learning that the user has gained in the past few week from conducting user testing, talking to their coaches, or pitching ideas to others.",
                 "What have you learned from those user testing?"],
