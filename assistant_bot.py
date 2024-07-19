@@ -159,14 +159,14 @@ def get_risk_framework():
         return framework
     
 # use risk framework to diagnose
-def diagnose(user_input):
+def diagnose(user_details):
 #   category = categorize_chain.invoke({"input": user_input, "areas": schema.risk_model.keys()})
 #   cat_list = ast.literal_eval(category)
 #   risk_area = [schema.risk_model[k] for k in cat_list]
     risk_framework = get_risk_framework()
     diagnosis = None
     try:
-        diagnosis = llm_chains.diagnose_chain.invoke({"input": user_input, "risk": risk_framework})
+        diagnosis = llm_chains.diagnose_chain.invoke({"input": user_details, "risk": risk_framework})
     except:
         diagnosis = 'Sorry there was some technical error. Could you please try to refresh the page?'
            
@@ -269,7 +269,7 @@ if answer := st.chat_input("Please type your response here. "):
                 st.session_state.last_risk = risk
                 reason_qs = st.session_state.diagnosis_library[risk]
                 print("next risk to ask about: ", risk, reason_qs)
-                next_question = llm_chains.diag_qa_chain.invoke({ "question": reason_qs[1], "risk": reason_qs[0], "history":st.session_state.messages[-2:], "human_input": answer})  
+                next_question = llm_chains.diag_qa_chain.invoke({ "question": reason_qs[1], "risk": reason_qs[0], "history":st.session_state.messages[-3:], "human_input": answer})  
                 assistant_response = next_question
                 st.session_state.risks.pop(0)
 

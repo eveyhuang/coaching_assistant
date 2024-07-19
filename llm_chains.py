@@ -68,9 +68,9 @@ proj_question_chain = question_prompt | checkin_model | StrOutputParser()
 
 # Prompt for summarizing 
 
-summary_prompt_template = """ You are a helpful assistant that summarizes all the content in the `information` blocks into a single, less-than-30-word sentence.
-    Do not make up any information that is not provided. 
-    Replace reference to the user with only the first name in user's full name: {name}
+summary_prompt_template = """ You are a helpful assistant that summarizes all the content in the `information` blocks into a single, less-than-30-word half-sentence that doesn't have subjects.
+    Do not make up any information that is not provided, but make sure your summary maintains all the nuance.
+    Only return the summary and nothing else.
     
     Information:
     {information} 
@@ -157,7 +157,7 @@ Classification:"""
 diagnosis_schema =[
     ResponseSchema(name="diagnosed_risks", description="list of the names of diagnosed risks"),
     ResponseSchema(name="reasoning_for_risks", description="list of the reasoning for each of the diagnosed risks"),
-    # ResponseSchema(name="questions_to_ask", description="list of questions to ask the user"),
+    ResponseSchema(name="questions_to_ask", description="list of questions to ask the user to help them reflect on this risk and think about what they plan to do if they don't have an answer"),
 ]
 
 output_parser=StructuredOutputParser.from_response_schemas(diagnosis_schema)
@@ -166,10 +166,10 @@ format_instructions = output_parser.get_format_instructions()
 prompt = PromptTemplate(
     template="""You are a helpful thought partner that challenges novice entrepreneurs' 
         assumptions and help them identify possible risks that may make their products fail. 
-        Given the user (who is a novice entrepreneur) input below, and a list of common risks: {risk}
-        Use each of the risk to evaluate user input and diganose the top three risks that are most relevant to the input, might be present, and might occur in the near future. Explain your reasoning on your diagnosis. 
-        if the risk you identified is about having risky asusmptions that are either not identified or validated, include a possible risky assumption in your reasoning. 
-        structure your output into json format using these keys: diagnosed_risks, reasoning_for_risks, questions_to_ask. follow format instruction: \n{format_instructions}
+        Given all the information about the user in the 'input' block, and a list of common risks: {risk}
+        Use each of the risk to evaluate user input and diganose the top three risks that are most relevant to the input, might be present, and might occur in the near future. 
+        Explain your reasoning on your diagnosis. If the risk you identified is about having risky asusmptions that are either not identified or validated, include a possible risky assumption in your reasoning. 
+        Structure your output into json format using these keys: diagnosed_risks, reasoning_for_risks, questions_to_ask. follow format instruction: \n{format_instructions}
 
 <input>
 {input}
@@ -186,12 +186,14 @@ diagnose_chain = prompt | llm | output_parser
 # LLM chain for diagnosis
 diag_qa_chain = (
     PromptTemplate.from_template(
-        """You are an experienced entrepreneur who deeply understands the fundamentals of entrepreneurship, the importance of asking good questions and challenging one's assumptions.
-        First, if the user has asked a question or ask you for help in the 'human_input' block, responds and helps the user with 1 sentence. Skip this step if the user has not asked for help or questions in the block. 
-        Second, in one setence, explain to the user that you think there might be a possible risk: {risk}.
-        Then ask the user this question: {question} to help them articulate or says what they plan to do to if they don't have the answer.
-        make sure the question is tailored to the context in the history. Replace names with the second pronoun. 
-        Keep your whole response short, fun, friendly, and conversational, and only return the requested response.
+        """You are an experienced entrepreneur who deeply understands the fundamentals of entrepreneurship, 
+        and you want to ask the user, a novice entrepreneur, good questions to help them identify and reflect on risks that may make their venture fail if left unaddressed.
+        In one setence, explain to the user that you think there might be a possible risk: {risk}.
+        Then ask these questions: [{question}].
+        If and only if there is a question in the 'human_input' block, adds a one-sentence respond to the question at the begining of your response. 
+        Make sure to tailor your whole response to the context in the 'history' block, and replace names with the second pronoun. 
+        Keep your whole response short, friendly, and conversational. 
+        Only return the requested response.
 
     History of conversation: {history}
     User: {human_input}
@@ -202,3 +204,6 @@ Classification:"""
     | llm
     | StrOutputParser()
 )
+
+
+#      
