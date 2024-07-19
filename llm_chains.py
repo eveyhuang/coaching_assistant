@@ -186,12 +186,12 @@ diagnose_chain = prompt | llm | output_parser
 # LLM chain for diagnosis
 diag_qa_chain = (
     PromptTemplate.from_template(
-        """You are an expert entrepreneurship coach that asks users reflective questions to help them articulate thinking and realize possible risk in their project. 
-        If there is an unanswered question from the user in the history, briefly responds to it with a hint, but tell the user to get hel from the coach in person.
-        Then, in one concise and coherent setence, tell the user the potential risk you have identifed: {risk}. and ask this question: {question} 
-        make sure the question is tailored to the context in the history. 
-        Keep your whole response short (less than 50 words), and in friendly, and supportive tone.
-        Only output the requested content.
+        """You are an experienced entrepreneur who deeply understands the fundamentals of entrepreneurship, the importance of asking good questions and challenging one's assumptions.
+        First, if the user has asked a question or ask you for help in the 'human_input' block, responds and helps the user with 1 sentence. Skip this step if the user has not asked for help or questions in the block. 
+        Second, in one setence, explain to the user that you think there might be a possible risk: {risk}.
+        Then ask the user this question: {question} to help them articulate or says what they plan to do to if they don't have the answer.
+        make sure the question is tailored to the context in the history. Replace names with the second pronoun. 
+        Keep your whole response short, fun, friendly, and conversational, and only return the requested response.
 
     History of conversation: {history}
     User: {human_input}

@@ -6,17 +6,17 @@ from typing import Optional
 
 #dictionary of areas that the LLM model should ask about
 proj_Questions = {
-    'project_information': ["The most updated, current information about a student's venture, such as the problem the venture aims to solve, and students' proposed solution to solve that problem.", 
-                "How about let's start by telling me a little about what your venture is about and what has been going on in the past few weeks? I know things probably have changed quite a bit since you first started, so just tell me your most current version."],
-    'process':["the most recent updates that the student has on the venture; including actions they are taking right now, goals they are trying to achieve right now.  Includes testing, fund-raising activities, building prototypes, etc.", 
-               "Can you tell me what you have been working on for the past few weeks to make progress on your project?"],
+    'project_information': ["The most updated, current information about a student's venture, including the problem the venture aims to solve, and proposed solution to solve that problem.", 
+                "How about let's start by telling me a little about what your venture is about, what is the problem you are trying to solve and what is your proposed solution? I know things probably have changed quite a bit since you first started, so just tell me your most current version."],
+    'process':["the most recent updates that the student has on the venture; including actions they are taking right now, biggest problems they are trying to solve, questions trying to answer right now.", 
+               "What is the biggest question you are trying to answer or problem you are trying to solve right now? And can you tell me what you have been doing for the past two weeks to answer that question?"],
     'learning':["Learning that the user has gained in the past few week from conducting user testing, talking to their coaches, or pitching ideas to others.",
                 "What have you learned from those user testing?"],
     'obstacles':["Whether the user has experienced any obstacles when working on their project during the last few weeks", 
                  "Did you encounter any obstacles or roadblocks while working on your project during the last few weeks?"],
     'planning':["Goals that the user plans to accomplish in the next few weeks to advance their project", 
                   "For the upcoming two weeks, what do you plan to accomplish to advance your project?"],
-    'emotions':["Any emotions that the user might be experiencing while working on their project, such as feeling stressed, motivated, discouraged, etc. ", 
+    'emotions':["Emotions that the user might be feeling with their experience working on their venture, such as feeling stressed, motivated, discouraged, etc. ", 
                 "How have you been feeling for the past few weeks while working on your project and working through this obstacle? excited? confused? discouraged?"]
 }
 

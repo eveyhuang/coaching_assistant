@@ -63,7 +63,7 @@ st.markdown('### ' + sel_stu)
 
 
 # section to display the most recent reflection
-st.markdown("#### Check-in")
+st.markdown("#### Summary of Project Info")
 ref_toshow = filtered_ref_df.iloc[:1][['project_information', 'process', 'learning', 'obstacles', 'planning', 'emotions']].copy()
 ref_toshow = ref_toshow.T
 ref_toshow.columns=['information']

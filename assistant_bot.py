@@ -164,7 +164,13 @@ def diagnose(user_input):
 #   cat_list = ast.literal_eval(category)
 #   risk_area = [schema.risk_model[k] for k in cat_list]
     risk_framework = get_risk_framework()
-    diagnosis = llm_chains.diagnose_chain.invoke({"input": user_input, "risk": risk_framework})
+    diagnosis = None
+    try:
+        diagnosis = llm_chains.diagnose_chain.invoke({"input": user_input, "risk": risk_framework})
+    except:
+        diagnosis = 'Sorry there was some technical error. Could you please try to refresh the page?'
+           
+    
     return diagnosis
 
 # retrieve a student's previous planning from firebase db
