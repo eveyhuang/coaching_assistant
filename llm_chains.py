@@ -23,33 +23,36 @@ from langsmith.wrappers import wrap_openai
 from langsmith import traceable
 import openai
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
-
+from langchain_groq import ChatGroq
+import streamlit as st
 
 # llm model
-llm = ChatOpenAI(temperature=0, model="gpt-4")
-
+tag_llm = ChatOpenAI(
+    openai_api_key=st.secrets['config']['openai_api_key'],
+    temperature=0, 
+    model="gpt-4o")
+llm = ChatGroq(
+    groq_api_key=st.secrets['config']['GROQ_API_KEY'],
+    temperature=0,
+    model="llama3-70b-8192"
+)
+checkin_model = llm
 
 #### TAGGING CHAINS; take a schema return a tagging chain model
 # ref_tag_chain = create_tagging_chain_pydantic(schema.ReflectionSchema, ChatOpenAI(temperature=0, model="gpt-4"))
-proj_tag_chain = create_tagging_chain_pydantic(schema.ProjectSchema, ChatOpenAI(temperature=0, model="gpt-4"))
+#proj_tag_chain = create_tagging_chain_pydantic(schema.ProjectSchema, ChatOpenAI(temperature=0, model="gpt-4"))
+
+tagging_template = """ Extract the desired information about the user from the following conversation between an assistant and the user in the input below.
+                    Use the question asked by the assistant as context, extract properties that match the descriptions closely in the 'information_extraction' function from user's response.
+                    Extract as many relevant properties as possible at once, but do NOT make up any information.     
+                    When extracting properties, rephrase and summarize it into short and coherent sentences and fix any typos or grammar errors.  
+                    Conversation:
+                    {input}
+                    """
+
+proj_tag_chain = create_tagging_chain_pydantic(pydantic_schema=schema.ProjectSchema, llm=tag_llm, prompt= ChatPromptTemplate.from_template(tagging_template))
 
 
-# (V1) prommt for formulating questions to checkin in with students 
-# ref_quesion_prompt = """ You are a coaching assistant who ask users reflective questions to help them reflect on their progress.
-#     Formulate a question in a friendly and supportive tone about an item: {item}, based on its description: {description}. An example will be {example}.
-#     If the item is "progress", you should remind the user what his previous goal was from your last check in ({previous_goal}).
-#     However, if previous goal ({previous_goal}) is not available, you should ask the user to remind you what was the goal they set for themselves to work on last week. 
-#     You should only ask about {item}, ask one question at a time. 
-#     Do not make up any answers for the human. Wait for them to respond.
-    
-#     History of conversation: {history}
-#     User: {human_input}
-#     Assistant: 
-# """
-
-
-
-checkin_model = ChatOpenAI(temperature=0, model="gpt-4")
 
 # prommt for formulating questions to help students provide information on project 
 proj_quesion_prompt = """ You are an experienced entrepreneurship coach. You are coaching users by asking them reflective questions to help them articulate their project details.
@@ -67,27 +70,15 @@ question_prompt = ChatPromptTemplate.from_template(proj_quesion_prompt)
 proj_question_chain = question_prompt | checkin_model | StrOutputParser()
 
 
-# checkin_chains = {
-#     "project": proj_chain,
-#     "reflections": ref_chain
-# }
 
-# return the llm chain to formulate checkin questions based on mode (reflection or project)
-# def getCheckinChain(mode):
-#     return checkin_chains[mode]
+# Prompt for summarizing 
 
-
-
-# Prompt for summarizing check-in for coaches
-
-summary_prompt_template = """ You are a helpful assistant that extracts and summarizes information about the user's venture by 
-    generating an accurate and concise summary of a conversation that is provided between the following `information` json blocks.
-    In your summaries, refer to the user with only first name.  Do not make up any information that is not in the provided `information` json blocks. 
-    Start your summary by saying that this is the recap of what the user has told you today and asks the user to confirm whether your summary is accurate at the end.
-    <checkin>
-        {information} 
-    <checkin/>
-
+summary_prompt_template = """ You are a helpful assistant that summarizes all the content in the `information` blocks into a single, less-than-30-word half-sentence that doesn't have subjects.
+    Do not make up any information that is not provided, but make sure your summary maintains all the nuance.
+    Only return the summary and nothing else.
+    
+    Information:
+    {information} 
     Assistant: 
 """
 
@@ -171,7 +162,7 @@ Classification:"""
 diagnosis_schema =[
     ResponseSchema(name="diagnosed_risks", description="list of the names of diagnosed risks"),
     ResponseSchema(name="reasoning_for_risks", description="list of the reasoning for each of the diagnosed risks"),
-    # ResponseSchema(name="questions_to_ask", description="list of questions to ask the user"),
+    ResponseSchema(name="questions_to_ask", description="list of questions to ask the user to help them reflect on this risk and think about what they plan to do if they don't have an answer"),
 ]
 
 output_parser=StructuredOutputParser.from_response_schemas(diagnosis_schema)
@@ -180,9 +171,10 @@ format_instructions = output_parser.get_format_instructions()
 prompt = PromptTemplate(
     template="""You are a helpful thought partner that challenges novice entrepreneurs' 
         assumptions and help them identify possible risks that may make their products fail. 
-        Given the user (who is a novice entrepreneur) input below, and a list of common risks: {risk}
-        Use each of the risk to evaluate user input and diganose the top three risks that are most relevant to the input, might be present, and might occur in the near future. Explain your reasoning on your diagnosis. 
-        structure your output into json format using these keys: diagnosed_risks, reasoning_for_risks, questions_to_ask. follow format instruction: \n{format_instructions}
+        Given all the information about the user in the 'input' block, and a list of common risks: {risk}
+        Use each of the risk to evaluate user input and diganose the top three risks that are most relevant to the input, might be present, and might occur in the near future. 
+        Explain your reasoning on your diagnosis. If the risk you identified is about having risky asusmptions that are either not identified or validated, include a possible risky assumption in your reasoning. 
+        Structure your output into json format using these keys: diagnosed_risks, reasoning_for_risks, questions_to_ask. follow format instruction: \n{format_instructions}
 
 <input>
 {input}
@@ -199,10 +191,14 @@ diagnose_chain = prompt | llm | output_parser
 # LLM chain for diagnosis
 diag_qa_chain = (
     PromptTemplate.from_template(
-        """You are a helpful thought partner that asks users reflective questions to help them articulate thinking and realize possible risk in their project. 
-        In a coherent setence, tell the user the potential risk you have identifed: {risk} 
-        and ask this question: {question} in friendly and supportive tone. 
-        make sure the question is tailored to the context in the history.
+        """You are an experienced entrepreneur who deeply understands the fundamentals of entrepreneurship, 
+        and you want to ask the user, a novice entrepreneur, good questions to help them identify and reflect on risks that may make their venture fail if left unaddressed.
+        In one setence, explain to the user that you think there might be a possible risk: {risk}.
+        Then ask these questions: [{question}].
+        If and only if there is a question in the 'human_input' block, adds a one-sentence respond to the question at the begining of your response. 
+        Make sure to tailor your whole response to the context in the 'history' block, and replace names with the second pronoun. 
+        Keep your whole response short, friendly, and conversational. 
+        Only return the requested response.
 
     History of conversation: {history}
     User: {human_input}
@@ -213,3 +209,6 @@ Classification:"""
     | llm
     | StrOutputParser()
 )
+
+
+#      

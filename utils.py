@@ -6,18 +6,20 @@ from datetime import date, datetime
 import os
 import getpass
 import config 
+import streamlit as st
+import json
 
 def init_app(): 
     try:
         app = firebase_admin.get_app()
     except ValueError as e:
     
-        cred = credentials.Certificate('/Users/eveyhuang/Documents/garage-coaching/coachlasso/garage-coaching-firebase-adminsdk-q7veo-556584e663.json')
+        cred = credentials.Certificate(dict(st.secrets.firebase.fb_setting))
         app = firebase_admin.initialize_app(cred, {
-            'databaseURL': config.config["databaseURL"]
+            'databaseURL': st.secrets.config.databaseURL
         })
     if not os.environ.get('OPENAI_API_KEY'):
-        os.environ['OPENAI_API_KEY'] = config.config["openai_api_key"]
+        os.environ['OPENAI_API_KEY'] = st.secrets.config.openai_api_key
 
     return app
 
