@@ -24,10 +24,15 @@ from langsmith import traceable
 import openai
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain_groq import ChatGroq
+import streamlit as st
 
 # llm model
-tag_llm = ChatOpenAI(temperature=0, model="gpt-4o")
+tag_llm = ChatOpenAI(
+    openai_api_key=st.secrets['config']['openai_api_key'],
+    temperature=0, 
+    model="gpt-4o")
 llm = ChatGroq(
+    groq_api_key=st.secrets['config']['GROQ_API_KEY'],
     temperature=0,
     model="llama3-70b-8192"
 )
