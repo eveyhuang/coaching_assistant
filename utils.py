@@ -4,10 +4,7 @@ from firebase_admin import db
 import pandas as pd
 from datetime import date, datetime
 import os
-import getpass
-import config 
 import streamlit as st
-import json
 
 def init_app(): 
     try:

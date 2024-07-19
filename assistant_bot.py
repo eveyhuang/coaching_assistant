@@ -2,14 +2,11 @@
 import time
 import streamlit as st
 from datetime import date, datetime
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import db
 import utils
 import llm_chains
 import schema
 import json
-import ast
+
 
 
 app = utils.init_app()

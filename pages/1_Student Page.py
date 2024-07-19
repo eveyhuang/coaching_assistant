@@ -1,11 +1,5 @@
 import streamlit as st
 import utils
-import pandas as pd
-import numpy as np
-from st_aggrid import AgGrid
-import plotly.express as px 
-from datetime import datetime
-from streamlit_card import card
 from streamlit_dynamic_filters import DynamicFilters
 
 
