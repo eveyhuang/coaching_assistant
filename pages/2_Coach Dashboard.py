@@ -42,7 +42,7 @@ risk_df = utils.format_risk_framework(risk_framework)
 
 stu_dia_data = load_data('coaching_agenda')
 stu_dia_df = utils.format_stu_diagnosis(stu_dia_data)
-print("retrieved student diagnosis data:     ", stu_dia_df)
+# print("retrieved student diagnosis data:     ", stu_dia_df)
 
 dynamic_filters = DynamicFilters(reflection_df, filters = ['full_name', 'date'])
 
@@ -56,14 +56,14 @@ sel_stu = filtered_ref_df.iloc[0]['full_name']
 sel_date = filtered_ref_df.iloc[0]['date']
 filtered_dia_df = diagnosis_df[(diagnosis_df['full_name']==sel_stu) & (diagnosis_df['date']==sel_date)]
 filt_stu_dia_df = stu_dia_df[(stu_dia_df['full_name']==sel_stu) & (stu_dia_df['date']==sel_date)]
-print("filtered student diagnosis data with name: ", sel_stu, "; Date:   ", sel_date, ":   ", filt_stu_dia_df)
+# print("filtered student diagnosis data with name: ", sel_stu, "; Date:   ", sel_date, ":   ", filt_stu_dia_df)
 # section for student and project information
 
 st.markdown('### ' + sel_stu)
 
 
 # section to display the most recent reflection
-st.markdown("#### Check-in")
+st.markdown("#### Summary of Project Info")
 ref_toshow = filtered_ref_df.iloc[:1][['project_information', 'process', 'learning', 'obstacles', 'planning', 'emotions']].copy()
 ref_toshow = ref_toshow.T
 ref_toshow.columns=['information']
@@ -111,32 +111,36 @@ if len(stu_tab_labels)>0:
 else:
     st.markdown(":red[The student has not conducted any diagnosis yet.]")
 
-st.markdown('##### Other risks diagnosed by system')
+with st.expander('##### Other risks diagnosed by system'):
+    # dictionary of risks diagnosed by system but not chosen by student
+    dia_dict = {}
+    for col in filtered_dia_df.columns:
+        if col in list_all_risks and col not in list_stu_risks:
+            items = filtered_dia_df.iloc[0][col]
+            if isinstance(items, list):
+                diag = [col, items[0], items[1], items[2]]
+                dia_dict[col]=[items[0], items[1], items[2]]
+            else:
+                list_diagnosed_risks.remove(col)
 
+    # display other risks 
+    sys_tab_labels = list(dia_dict.keys())
+    tabs = st.tabs(sys_tab_labels)
+    for label, tab in zip(sys_tab_labels, tabs):
+        with tab:
+            st.checkbox(":gray-background[Risk: "+ dia_dict[label][0]+']', key=label)
+            st.markdown(":blue[**Question Asked:** "+dia_dict[label][1] + ']')
+            st.markdown(":green[**Student's Response:** " +dia_dict[label][2] + ']')
 
-# dictionary of risks diagnosed by system but not chosen by student
-dia_dict = {}
-for col in filtered_dia_df.columns:
-    if col in list_all_risks and col not in list_stu_risks:
-        items = filtered_dia_df.iloc[0][col]
-        if isinstance(items, list):
-            diag = [col, items[0], items[1], items[2]]
-            dia_dict[col]=[items[0], items[1], items[2]]
-        else:
-            list_diagnosed_risks.remove(col)
-
-# display other risks 
-sys_tab_labels = list(dia_dict.keys())
-tabs = st.tabs(sys_tab_labels)
-for label, tab in zip(sys_tab_labels, tabs):
-    with tab:
-        st.checkbox(":gray-background[Risk: "+ dia_dict[label][0]+']', key=label)
-        st.markdown(":blue[**Question Asked:** "+dia_dict[label][1] + ']')
-        st.markdown(":green[**Student's Response:** " +dia_dict[label][2] + ']')
+with st.expander("##### Other risks to consider"):
+    st.markdown('All other risks in the system')
+    for col in list_all_risks:
+        if col not in list_diagnosed_risks:
+            st.checkbox(":gray[ "+ col + ": " + risk_df.iloc[0][col] + ']', key=col)
 
 
 # area for coaches to add notes
-st.markdown("#### Coaching Agenda", help = "Choose risks that you think are the most relevant, or write down additional risks that you have diagnosed.")
+st.markdown("#### Coaching Agenda / Notes")
 risk_to_disucss = {}
 for risk in list_diagnosed_risks or list_stu_risks:
     if risk in list_all_risks:
@@ -150,7 +154,7 @@ for risk in list_diagnosed_risks or list_stu_risks:
 
 with st.form('additional_risk'):
     
-    stu_risk = st.text_input("Add additional risks or items that you would like to discuss with the student", "")
+    stu_risk = st.text_input("Pick risks you would like to discuss and write down your notes below", "")
     submitted = st.form_submit_button("Submit")
     if submitted:
         risk_to_disucss['student_submitted'] = stu_risk

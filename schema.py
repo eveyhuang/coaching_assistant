@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, conlist
+from pydantic import BaseModel, Field
 from typing import Optional
 
 
@@ -6,18 +6,18 @@ from typing import Optional
 
 #dictionary of areas that the LLM model should ask about
 proj_Questions = {
-    'project_information': ["information about student's project, such as intended users and their needs, and students' proposed solution to solve those needs.", 
-                "In a few sentences, could you please tell me aboout your venture. Who are your targeted users, what are their needs, and what is your proposed product to solve that need?"],
-    'process':["actions students have taken to make progress in the past two weeks, such as testing, fund-raising activities, building prototypes, etc.", 
-               "Can you tell me what you have been working on for the past few weeks to make progress on your vneture?"],
+    'project_information': ["The most updated, current information about a student's venture, including the problem the venture aims to solve, and proposed solution to solve that problem.", 
+                "How about let's start by telling me a little about what your venture is about, what is the problem you are trying to solve and what is your proposed solution? I know things probably have changed quite a bit since you first started, so just tell me your most current version."],
+    'process':["the most recent updates that the student has on the venture; including actions they are taking right now, biggest problems they are trying to solve, questions trying to answer right now.", 
+               "What is the biggest question you are trying to answer or problem you are trying to solve right now? And can you tell me what you have been doing for the past two weeks to answer that question?"],
     'learning':["Learning that the user has gained in the past few week from conducting user testing, talking to their coaches, or pitching ideas to others.",
                 "What have you learned from those user testing?"],
-    'obstacles':["Whether the user has experienced any obstacles when working on their venture during the last few weeks", 
-                 "Did you encounter any obstacles or roadblocks while working on your venture during the last few weeks?"],
-    'planning':["Goals that the user plans to accomplish in the next few weeks to advance their venture", 
-                  "For the upcoming two weeks, what do you plan to accomplish to advance your venture?"],
-    'emotions':["Emotions that the user is experiencing, such as feeling stressed, motivated, discouraged, etc. d", 
-                "How have you been feeling for the past few weeks while working on your venture and working through this obstacle? excited? confused? discouraged?"]
+    'obstacles':["Whether the user has experienced any obstacles when working on their project during the last few weeks", 
+                 "Did you encounter any obstacles or roadblocks while working on your project during the last few weeks?"],
+    'planning':["Goals that the user plans to accomplish in the next few weeks to advance their project", 
+                  "For the upcoming two weeks, what do you plan to accomplish to advance your project?"],
+    'emotions':["Emotions that the user might be feeling with their experience working on their venture, such as feeling stressed, motivated, discouraged, etc. ", 
+                "How have you been feeling for the past few weeks while working on your project and working through this obstacle? excited? confused? discouraged?"]
 }
 
 
@@ -29,22 +29,10 @@ risk_model = {
     'distribution_channels': "If entrepreneurs do not know how they will build and distribute the solutiond or if they lack evidence that their strategy will work there is a risk of designing something that never goes to customers' hands.",
     'testing': 'If entrepreneurs do not test with intended customers regularly, there is a risk they will be unable to check whether they are making progress toward a solution the customers want.',
     'planning': 'if entrepreneurs do not plan actional and feasible goals based on important risks that will hinder their success, there is a risk that they may end up doing busy work that does not produce value nor help them progress.',
-    'raising_capital': 'If entrepreneurs are overly focused on raising venture capital, there’s risk that raising money is the trophy they seek at the expense of building a great product and business. ',
+    'raising_capital': 'If entrepreneurs are overly focused on raising project capital, there’s risk that raising money is the trophy they seek at the expense of building a great product and business. ',
     'communicate_with_customers': 'If entrepreneurs do not clearly articulate and communicate their brand promise and how the product delivers on it, there is a risk that customers may perceive the solution as inadequate.'
 }
 
-# risk_model = {
-#     'project_information': ["If entrepreneurs cannot articulate intended customers' need that is supported by evidence, there is a risk they will misconstrue the root cause(s) of that need and design ineffective solutions.",
-#                             "If entrepreneurs cannot explain and provide evidence of how their solution will solve the customer's problem, there is a risk that it will not.",
-#                             "If entrepreneurs have not thoroughly researched existing solutions, and that their solution is inferior to those existing solutions, there is a risk that the customer will not adopt it.",
-#                             "If entrepreneurs do not know how they will build and distribute the solutiond or if they lack evidence that their strategy will work there is a risk of designing something that never goes to customers' hands."],
-#     'process': ['If entrepreneurs do not test with intended customers regularly, there is a risk they will be unable to check whether they are making progress toward a solution the customers want.',
-#                 'If entrepreneurs do not clearly articulate and communicate their brand promise and how the product delivers on it, there is a risk that customers may perceive the solution as inadequate.',
-#                 'If entrepreneurs are overly focused on raising venture capital, there’s risk that raising money is the trophy they seek at the expense of building a great product and business. '],
-#     'planning': 'if entrepreneurs do not plan actional and feasible goals based on important risks that will hinder their success, there is a risk that they may end up doing busy work that does not produce value nor help them progress.',
-#     'learning': 'if entrepreneurs do not reflect on and synthesize learning, there is risk that they will not learn from their experience and advance their project',
-#     'obstacles': 'if entrepreneurs do not reflect on why they experienced certain obstacles and how they might improve, there is a risk that they will experience those obstacles again'
-# }
 
 # Schema for all the reflectiev questions to ask students
 
@@ -57,7 +45,7 @@ class ProjectSchema(BaseModel):
 
     project_information: Optional[str] = Field(
         None,
-        description=""""Information about the user's venture, such as intended users and their needs, proposed solution and it's value proposition, existing solutions and their limitations, and distribution channel etc.", 
+        description=""""Information about the user's most recent status of their project, such as intended users and their needs, proposed solution and it's value proposition, existing solutions and their limitations, and distribution channel etc.", 
                """
     )
 
@@ -73,17 +61,17 @@ class ProjectSchema(BaseModel):
 
     obstacles: Optional[str] = Field(
         None,
-        description="""Obstacles that the user has experienced when working on their venture""",
+        description="""Obstacles that the user has experienced when working on their project""",
     )
 
     planning: Optional[str] = Field(
         None,
-        description= """Goals that the user plans to accomplish in the next few weeks to advance their venture."""
+        description= """Goals that the user plans to accomplish in the next few weeks to advance their project."""
     )
 
     emotions: Optional[str] = Field(
         None,
-        description= """Emotions that the user is experiencing.  """
+        description= """Any emotions that the user might be experiencing while working on their project, such as feeling stressed, motivated, discouraged, etc."""
     )
 
     # solution: Optional[str] = Field(
