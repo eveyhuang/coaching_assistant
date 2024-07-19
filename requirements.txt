@@ -1,4 +1,5 @@
 firebase_admin
+firebase
 streamlit
 langchain
 langsmith
