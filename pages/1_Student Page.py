@@ -100,11 +100,11 @@ for label, tab in zip(tab_labels, tabs):
         st.markdown(":green[**Your Response:** " +dia_dict[label][2] + ']')
 
 
-st.markdown('##### Other risks to consider', help='Pick the risks that you think might be relevant to get help from your coach.')
-
-for col in list_all_risks:
-    if col not in list_diagnosed_risks:
-        st.checkbox(":gray[ "+ col + ": " + risk_df.iloc[0][col] + ']', key=col)
+with st.expander("##### Other risks to consider"):
+    st.markdown('Pick and click on risks that you would like to discuss and get help from your coach.')
+    for col in list_all_risks:
+        if col not in list_diagnosed_risks:
+            st.checkbox(":gray[ "+ col + ": " + risk_df.iloc[0][col] + ']', key=col)
 
 
 
@@ -118,6 +118,8 @@ for risk in list_all_risks:
             risk_to_disucss[risk]=dia_dict[risk]
         else:
             risk_to_disucss[risk]= risk_df.iloc[0][risk]
+
+
 with st.form('additional_risk'):
     
     stu_risk = st.text_input("Write down additional risks, notes, or anything else that you would like to discuss with your coach below:", "")
