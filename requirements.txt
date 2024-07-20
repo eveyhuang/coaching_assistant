@@ -7,3 +7,4 @@ langchain_openai
 pandas
 numpy
 streamlit_dynamic_filters
+langchain_community
