@@ -1,7 +1,7 @@
 firebase-admin
 firebase
 streamlit
-langchain
+langchain==0.0.216
 langsmith
 langchain_openai
 pandas
