@@ -6,6 +6,7 @@ langsmith
 langchain_openai
 pandas
 numpy
+pydantic==1.10
 streamlit_dynamic_filters
 langchain_groq
 langchain_community
