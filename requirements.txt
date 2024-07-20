@@ -3,11 +3,11 @@ firebase
 streamlit
 langchain==0.0.216
 langsmith==0.1.82
-langchain_openai==0.0.8
+langchain_openai
 pandas
 numpy
 pydantic==1.10
 streamlit_dynamic_filters==0.1.6
 langchain_groq==0.1.5
 langchain_community==0.0.28
-typing-extensions>=4.5.0
+typing-extensions==4.5.0
