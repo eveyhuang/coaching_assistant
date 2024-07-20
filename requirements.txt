@@ -3,7 +3,6 @@ firebase
 streamlit
 langchain
 langsmith
-ast
 langchain_openai
 pandas
 numpy
