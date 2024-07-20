@@ -1,10 +1,11 @@
-firebase_admin
+firebase-admin
 firebase
 streamlit
 langchain
 langsmith
-ast
 langchain_openai
 pandas
 numpy
 streamlit_dynamic_filters
+langchain_groq
+langchain_community

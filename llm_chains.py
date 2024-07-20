@@ -2,7 +2,6 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain_openai import OpenAI
 from langchain.chains import LLMChain
 from langchain_core.output_parsers import StrOutputParser
-import ast
 from langchain_community.utils.openai_functions import (
     convert_pydantic_to_openai_function,
 )
@@ -15,13 +14,12 @@ import schema
 from langchain_core.messages import AIMessage
 import json
 import re
-from typing import List, Optional
+from typing import List
 from langchain_community.utils.openai_functions import (
     convert_pydantic_to_openai_function,
 )
 from langsmith.wrappers import wrap_openai
 from langsmith import traceable
-import openai
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain_groq import ChatGroq
 import streamlit as st
