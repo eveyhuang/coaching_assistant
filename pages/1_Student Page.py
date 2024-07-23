@@ -19,8 +19,6 @@ def load_data(collection):
     data = ref.child(collection).get()    
     return data
 
-
-
 # load and save reflection df
 reflection_data = load_data('check_in')
 reflection_df = utils.format_reflection(reflection_data)
