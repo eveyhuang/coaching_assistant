@@ -10,13 +10,13 @@ proj_Questions = {
                 "How about let's start by telling me a little about your venture: what is the problem you are trying to solve and what is your proposed solution to solve this problen? "],
     'current_focus':["A specific aspect of running the venture (such as launching product, understanding customer's needs, or testing product market fit, etc) that the student is currently focusing on, and actions they are taking to make progress right now. ", 
                "What specific aspects of your venture are you currently focusing on? And what you have been doing for the past two weeks to make progress on that?"],
-    'learning':["The most useful and critical learning that the user has gained recently about any apsects of their venture, such as the problem, the effectiveness of their approach, or feedback from investors.",
+    'learning':["The most useful and critical learning that the student has gained recently about any apsects of their venture, such as the problem, the effectiveness of their approach, or feedback from investors.",
                 "Is there any recent learning that has been extremely benefiical or critical for your venture?"],
-    'obstacles':["Whether the user is currently experiencing any obstacles that they could use some help on from their coach.", 
+    'obstacles':["Whether the student is currently experiencing any obstacles that they could use some help on from their coach.", 
                  "Are you currently experiencing any obstacles or roadblocks that could use some help from your coach?"],
-    'planning':["Goals that the user plans to accomplish in the next few weeks to advance their project", 
+    'planning':["Goals that the student plans to accomplish in the next few weeks to advance their project", 
                   "For the upcoming two weeks, what do you plan to accomplish to advance your project?"],
-    'emotions':["Emotions that the user might be feeling with their experience working on their venture, such as feeling stressed, motivated, discouraged, etc. ", 
+    'emotions':["Emotions that the student might be feeling with their experience working on their venture, such as feeling stressed, motivated, discouraged, etc. ", 
                 "How have you been feeling for the past few weeks while working on your project and working through this obstacle? excited? confused? discouraged?"]
 }
 
@@ -61,17 +61,17 @@ class ProjectSchema(BaseModel):
 
     obstacles: Optional[str] = Field(
         None,
-        description="""Obstacles that the user is currently experiencing that they could use some help on from their coach.""",
+        description="""Obstacles that the student is currently experiencing that they could use some help on from their coach.""",
     )
 
     planning: Optional[str] = Field(
         None,
-        description= """Goals that the user plans to accomplish in the next few weeks to advance their project."""
+        description= """Goals that the student plans to accomplish in the next few weeks to advance their project."""
     )
 
     emotions: Optional[str] = Field(
         None,
-        description= """Any emotions that the user might be experiencing while working on their project, such as feeling stressed, motivated, discouraged, etc."""
+        description= """Any emotions that the student might be experiencing while working on their project, such as feeling stressed, motivated, discouraged, etc."""
     )
 
     # solution: Optional[str] = Field(
