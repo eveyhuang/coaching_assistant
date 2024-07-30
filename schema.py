@@ -8,7 +8,7 @@ from typing import Optional
 proj_Questions = {
     'project_information': ["The overview of a student's venture, including information about the problem this venture aims to solve, and the proposed solution to solve that problem.", 
                 "How about let's start by telling me a little about your venture: what is the problem you are trying to solve and what is your proposed solution to solve this problen? "],
-    'current_focus':["A specific aspect of the venture that the student is currently focusing on, and actions they are taking to make progress right now. ", 
+    'current_focus':["A specific aspect of running the venture (such as launching product, understanding customer's needs, or testing product market fit, etc) that the student is currently focusing on, and actions they are taking to make progress right now. ", 
                "What specific aspects of your venture are you currently focusing on? And what you have been doing for the past two weeks to make progress on that?"],
     'learning':["The most useful and critical learning that the user has gained recently about any apsects of their venture, such as the problem, the effectiveness of their approach, or feedback from investors.",
                 "Is there any recent learning that has been extremely benefiical or critical for your venture?"],
@@ -51,7 +51,7 @@ class ProjectSchema(BaseModel):
 
     current_focus: Optional[str] = Field(
         None,
-        description= """A specific aspect of the student's venture that he or she is currently focusing on, and actions he or she is taking to make progress right now. """
+        description= """Any specific aspects of the student's venture that he or she is currently focusing on, and actions he or she is taking to make progress right now. """
     )
 
     learning: Optional[str] = Field(
