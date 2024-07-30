@@ -6,14 +6,14 @@ from typing import Optional
 
 #dictionary of areas that the LLM model should ask about
 proj_Questions = {
-    'project_information': ["The most updated, current information about a student's venture, including the problem the venture aims to solve, and proposed solution to solve that problem.", 
-                "How about let's start by telling me a little about what your venture is about, what is the problem you are trying to solve and what is your proposed solution? I know things probably have changed quite a bit since you first started, so just tell me your most current version."],
-    'process':["the most recent updates that the student has on the venture; including actions they are taking right now, biggest problems they are trying to solve, questions trying to answer right now.", 
-               "What is the biggest question you are trying to answer or problem you are trying to solve right now? And can you tell me what you have been doing for the past two weeks to answer that question?"],
-    'learning':["Learning that the user has gained in the past few week from conducting user testing, talking to their coaches, or pitching ideas to others.",
-                "What have you learned from those user testing?"],
-    'obstacles':["Whether the user has experienced any obstacles when working on their project during the last few weeks", 
-                 "Did you encounter any obstacles or roadblocks while working on your project during the last few weeks?"],
+    'project_information': ["The overview of a student's venture, including information about the problem this venture aims to solve, and the proposed solution to solve that problem.", 
+                "How about let's start by telling me a little about your venture: what is the problem you are trying to solve and what is your proposed solution to solve this problen? "],
+    'current_focus':["A specific aspect of the venture that the student is currently focusing on, and actions they are taking to make progress right now. ", 
+               "What specific aspects of your venture are you currently focusing on? And what you have been doing for the past two weeks to make progress on that?"],
+    'learning':["The most useful and critical learning that the user has gained recently about any apsects of their venture, such as the problem, the effectiveness of their approach, or feedback from investors.",
+                "Is there any recent learning that has been extremely benefiical or critical for your venture?"],
+    'obstacles':["Whether the user is currently experiencing any obstacles that they could use some help on from their coach.", 
+                 "Are you currently experiencing any obstacles or roadblocks that could use some help from your coach?"],
     'planning':["Goals that the user plans to accomplish in the next few weeks to advance their project", 
                   "For the upcoming two weeks, what do you plan to accomplish to advance your project?"],
     'emotions':["Emotions that the user might be feeling with their experience working on their venture, such as feeling stressed, motivated, discouraged, etc. ", 
@@ -45,23 +45,23 @@ class ProjectSchema(BaseModel):
 
     project_information: Optional[str] = Field(
         None,
-        description=""""Information about the user's most recent status of their project, such as intended users and their needs, proposed solution and it's value proposition, existing solutions and their limitations, and distribution channel etc.", 
+        description=""""Any type of general information on different aspects of a student's venture, such as the problem the venture aims to solve, proposed solution to solve that problem, intended users and their needs, proposed solution and it's value proposition, existing solutions and their limitations, and distribution channel etc.", 
                """
     )
 
-    process: Optional[str] = Field(
+    current_focus: Optional[str] = Field(
         None,
-        description= """Actions users have taken to make progress in the past few weeks, such as testing, fund-raising activities, building prototypes, etc. """
+        description= """A specific aspect of the student's venture that he or she is currently focusing on, and actions he or she is taking to make progress right now. """
     )
 
     learning: Optional[str] = Field(
         None,
-        description= """Learning that the user has gained in the past few week from acitivies like conducting user testing, talking to mentors or peers, etc."""
+        description= """Useful and critical learning that the user has gained recently about any apsects of their venture, such as the problem, the effectiveness of their approach, or feedback from investors."""
     )
 
     obstacles: Optional[str] = Field(
         None,
-        description="""Obstacles that the user has experienced when working on their project""",
+        description="""Obstacles that the user is currently experiencing that they could use some help on from their coach.""",
     )
 
     planning: Optional[str] = Field(

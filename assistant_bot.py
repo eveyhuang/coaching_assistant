@@ -64,7 +64,7 @@ def check_what_is_empty(user_peronal_details):
 
 # add newly answered details into Reflection schema
 def add_non_empty_details(current_details: schema.ProjectSchema, new_details: schema.ProjectSchema):
-    non_empty_details = {k: v for k, v in new_details.dict().items() if v not in [None, "", False]}
+    # non_empty_details = {k: v for k, v in new_details.dict().items() if v not in [None, "", False]}
     # updated_details = current_details.copy(update=non_empty_details)
     copied = current_details.copy() 
     for k, v in new_details.dict().items():
@@ -80,10 +80,9 @@ def add_non_empty_details(current_details: schema.ProjectSchema, new_details: sc
 
 # use tagging chain to fill in ReflectionDetails schema
 def filter_response(tagging_chain, text_input, user_details):
-    # print("Tagging input: ", text_input)
-    # print("Old user details: ", user_details)
+    
     try:
-        res = tagging_chain.run(text_input)
+        res = tagging_chain.invoke(text_input)
         # print("**  after tagging: ", res)
         user_details = add_non_empty_details(user_details, res)
 
@@ -235,7 +234,9 @@ if answer := st.chat_input("Please type your response here. "):
             
             st.session_state.details, st.session_state.ask_for = filter_response(tagging_chain, st.session_state.messages[-2:], st.session_state.details)
             if st.session_state.ask_for != []:
+               
                 question_dict = checkin_schemas[st.session_state.mode][1]
+                
                 question_chain = proj_question_chain
                 assistant_response = ask_for_info(
                                                 question_chain,

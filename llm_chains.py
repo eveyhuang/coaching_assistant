@@ -29,6 +29,7 @@ tag_llm = ChatOpenAI(
     openai_api_key=st.secrets['config']['openai_api_key'],
     temperature=0, 
     model="gpt-4o")
+
 llm = ChatGroq(
     groq_api_key=st.secrets['config']['GROQ_API_KEY'],
     temperature=0,
@@ -54,10 +55,10 @@ proj_tag_chain = create_tagging_chain_pydantic(pydantic_schema=schema.ProjectSch
 
 # prommt for formulating questions to help students provide information on project 
 proj_quesion_prompt = """ You are an experienced entrepreneurship coach. You are coaching users by asking them reflective questions to help them articulate their project details.
-    Formulate a question that is tailored to the context of the chat, in a friendly and supportive tone about {item}, based on its description: {description}. 
-    An example will be: {example}.
-    You should only ask about {item}, ask one question at a time. 
-    Do not make up any answers for the human. Wait for them to respond.
+    Formulate a question that is tailored to the context of the chat, in a friendly and supportive tone about one thing: {item}, based on its description: {description}. 
+    Formulate your question based on this example: {example}.
+    You should only ask about this one thing, ask one question at a time. 
+    Do not make up any answers for the human. Wait for them to respond. No need to give examples on possible answers, keep your question very short, concise, and straight to the point.
     
     History of conversation: {history}
     User: {human_input}

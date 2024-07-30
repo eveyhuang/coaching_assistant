@@ -52,7 +52,12 @@ st.markdown('### ' + sel_stu)
 
 # section to display the most recent reflection
 st.markdown("#### Summary of your project info")
-ref_toshow = filtered_ref_df.iloc[:1][['project_information', 'process', 'learning', 'obstacles', 'planning', 'emotions']].copy()
+col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'emotions']
+try:
+    ref_toshow = filtered_ref_df.iloc[:1][col].copy()
+except:
+    filtered_ref_df=filtered_ref_df.rename(columns = {'process':'current_focus'})
+    ref_toshow = filtered_ref_df.iloc[:1][col].copy()
 ref_toshow = ref_toshow.T
 ref_toshow.columns=['information']
 st.table(ref_toshow)
