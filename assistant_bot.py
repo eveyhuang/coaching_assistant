@@ -67,32 +67,36 @@ def add_non_empty_details(current_details: schema.ProjectSchema, new_details: sc
     # non_empty_details = {k: v for k, v in new_details.dict().items() if v not in [None, "", False]}
     # updated_details = current_details.copy(update=non_empty_details)
     copied = current_details.copy() 
-    for k, v in new_details.dict().items():
-        if v not in [None, "", False]:
-            if k in current_details.dict().keys():
-                if copied.__dict__[k] in [None, "", False]:
-                    copied.__dict__[k] = v
-                elif v not in copied.__dict__[k]:
-                    print("UPDATE: adding to [ " + k + " ] with: [ " + v + " ]")
-                    copied.__dict__[k] += " " + v
+    try:
+        for k, v in new_details.dict().items():
+            if v not in [None, "", False]:
+                if k in current_details.dict().keys():
+                    if copied.__dict__[k] in [None, "", False]:
+                        copied.__dict__[k] = v
+                    elif v not in copied.__dict__[k]:
+                        print("UPDATE: adding to [ " + k + " ] with: [ " + v + " ]")
+                        copied.__dict__[k] += " " + v
     # updated_details = current_details
+    except:
+        print("Issues with adding non empty details")
     return copied
 
 # use tagging chain to fill in ReflectionDetails schema
 def filter_response(tagging_chain, text_input, user_details):
     
     try:
-        res = tagging_chain.invoke(text_input)
-        # print("**  after tagging: ", res)
-        user_details = add_non_empty_details(user_details, res)
-
-        print("**** Newest user detail: ", user_details)
-        ask_for = check_what_is_empty(user_details)
-        print("ask for: ", ask_for)
-        return user_details, ask_for
+        res = tagging_chain.run(text_input)
     except:
-        print("encountered errors while trying to tag input")
-        return st.session_state.details, st.session_state.ask_for
+        print("Had issues with tagging chain." )
+        res = user_details
+    # print("**  after tagging: ", res)
+    user_details = add_non_empty_details(user_details, res)
+
+    print("**** Newest user detail: ", user_details)
+    ask_for = check_what_is_empty(user_details)
+    print("Remaining qs to ask for: ", ask_for)
+    return user_details, ask_for
+    
 
 # summarize data in user details
 def summarize_all_details(user_details):
