@@ -191,7 +191,7 @@ def get_prevgoals(stu_name):
 
 
 if "messages" not in st.session_state:
-    question = "Hello, I am here to help you reflect on your recent progress, think about potential risks, and prepare for your next coaching session. Your responses will be summarized and shown to your coach before your next session.  \n  \n To get started, please tell me (1) your name; (2) what your venture is about; and (3) what you are currently focusing on."
+    question = "Hello, I am here to help you reflect on your recent progress, think about potential risks, and prepare for your next coaching session. Our conversation will be summarized and shown to your coach before your next session.  \n  \n To get started, please tell me (1) your name; (2) what your venture is about; and (3) what you are currently focusing on."
     st.session_state.messages = [{"role":"assistant", "content":question}]
     
 # default state should be reflections. but it can change    
