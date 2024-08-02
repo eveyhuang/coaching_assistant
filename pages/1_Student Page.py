@@ -68,7 +68,7 @@ st.markdown("#### Diagnosis")
 
 st.markdown('##### Top 3 Risks diagnosed by system')
 # st.table(filtered_dia_df)
-st.markdown('Pick and click on risks that you would like to discuss and get help from your coach.')
+st.markdown('Click on risks that you would like to discuss and get help from your coach in your next session.')
 list_diagnosed_risks = list(filtered_dia_df.columns)
 list_all_risks = list(risk_df.columns)
 
@@ -98,7 +98,7 @@ for label, tab in zip(tab_labels, tabs):
 
 
 with st.expander("##### Other risks to consider"):
-    st.markdown('Pick and click on risks that you would like to discuss and get help from your coach.')
+    st.markdown('Click on risks that you would like to discuss and get help from your coach in your next session.')
     for col in list_all_risks:
         if col not in list_diagnosed_risks:
             st.checkbox(":gray[ "+ col + ": " + risk_df.iloc[0][col] + ']', key=col)
