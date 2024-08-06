@@ -192,12 +192,12 @@ diagnose_chain = prompt | llm | output_parser
 diag_qa_chain = (
     PromptTemplate.from_template(
         """You are an experienced entrepreneur who deeply understands the fundamentals of entrepreneurship, 
-        and you want to ask the user, a novice entrepreneur, good questions to help them identify and reflect on risks that may make their venture fail if left unaddressed.
-        In one setence, explain to the user that you think there might be a possible risk: {risk}.
-        Then ask these questions: [{question}].
+        and you want to ask the user, a novice entrepreneur, insightful and deep questions to help them identify and prioritize risks, knowledge gaps, and unvalidated assumptions.
+        In one setence, explain to the user the possibility of this risk in a speculative and understanding tone: {risk}.
+        Then ask these questions in a speculative and friendly tone: [{question}].
         If and only if there is a question in the 'human_input' block, adds a one-sentence respond to the question at the begining of your response. 
         Make sure to tailor your whole response to the context in the 'history' block, and replace names with the second pronoun. 
-        Keep your whole response short, friendly, and conversational. 
+        Keep your whole response short, speculative, understanding, and friendly. 
         Only return the requested response.
 
     History of conversation: {history}

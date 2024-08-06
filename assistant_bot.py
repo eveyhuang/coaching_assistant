@@ -189,9 +189,17 @@ def get_prevgoals(stu_name):
         if reflection:
             prev_goal = reflection['planning']
 
+def getdetails(dict, item, pos):
+    if item == 'full_name':
+        if pos==0:
+            return 'Full name of the user'
+        else:
+            return 'Could you tell me what is your name?'
+    else:
+        return dict[item][pos]
 
 if "messages" not in st.session_state:
-    question = "Hello, I am here to help you reflect on your recent progress, think about potential risks, and prepare for your next coaching session. Our conversation will be summarized and shown to your coach before your next session.  \n  \n To get started, please tell me (1) your name; (2) what is the problem you are trying to solve and what is your solution; and (3) what aspects of your venture you are currently focusing on."
+    question = "Hello, I am here to help you prepare for your next coaching session.  \n  \nOur conversation will be summarized and shown to your coach before your next session.  \n  \n To get started, please tell me your name and what your venture is about: what is the user problem or market needs you are trying to tackle, and what is your proposed solution?"
     st.session_state.messages = [{"role":"assistant", "content":question}]
     
 # default state should be reflections. but it can change    
@@ -242,14 +250,15 @@ if answer := st.chat_input("Please type your response here. "):
                 question_dict = checkin_schemas[st.session_state.mode][1]
                 
                 question_chain = proj_question_chain
+                next_item = st.session_state.ask_for[0]
                 assistant_response = ask_for_info(
                                                 question_chain,
                                                 st.session_state.messages[-3:],
                                                 answer,
                                                 prev_goal,
-                                                st.session_state.ask_for[0], 
-                                                question_dict[st.session_state.ask_for[0]][0],
-                                                question_dict[st.session_state.ask_for[0]][1])
+                                                next_item,
+                                                getdetails(question_dict, next_item, 0),
+                                                getdetails(question_dict, next_item, 1))
             
             # once no more questions to ask, diagnose and move to diagnosis stage
             else:

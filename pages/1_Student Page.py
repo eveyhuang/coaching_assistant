@@ -51,7 +51,7 @@ st.markdown('### ' + sel_stu)
 
 
 # section to display the most recent reflection
-st.markdown("#### Summary of your project info")
+st.markdown("#### Summary of your project information")
 col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'emotions']
 try:
     ref_toshow = filtered_ref_df.iloc[:1][col].copy()
@@ -62,7 +62,7 @@ ref_toshow = ref_toshow.T
 ref_toshow.columns=['information']
 st.table(ref_toshow)
 
-
+st.markdown('---')
 # section to show diagnosis 
 st.markdown("#### Diagnosis")
 
@@ -80,13 +80,10 @@ for col in filtered_dia_df.columns:
         if isinstance(items, list):
             diag = [col, items[0], items[1], items[2]]
             dia_dict[col]=[items[0], items[1], items[2]]
-            # st.checkbox(items[0])
-            # st.write("Question asked: "+items[1] + "  \n" + "Response: "+ items[2])
-            # new_diag_df.append(diag)
+            
         else:
             list_diagnosed_risks.remove(col)
 
-# new_diag_df = pd.DataFrame(new_diag_df, columns = ['Name', 'Risk', 'Question', 'Response'])
 
 tab_labels = list(dia_dict.keys())
 tabs = st.tabs(tab_labels)
@@ -96,14 +93,15 @@ for label, tab in zip(tab_labels, tabs):
         st.markdown(":blue[**Question Asked:** "+dia_dict[label][1] + ']')
         st.markdown(":green[**Your Response:** " +dia_dict[label][2] + ']')
 
-
-with st.expander("##### Other risks to consider"):
-    st.markdown('Click on risks that you would like to discuss and get help from your coach in your next session.')
+st.markdown('---')
+st.markdown('##### Other risks to consider')
+with st.expander("Click on risks that you would like to discuss with your coach in your next session."):
+    
     for col in list_all_risks:
         if col not in list_diagnosed_risks:
             st.checkbox(":gray[ "+ col + ": " + risk_df.iloc[0][col] + ']', key=col)
 
-
+st.markdown('---')
 
 st.markdown("#### Coaching Agenda")
 risk_to_disucss = {}
