@@ -52,7 +52,10 @@ st.markdown('### ' + sel_stu)
 
 # section to display the most recent reflection
 st.markdown("#### Summary of your project information")
-col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'emotions']
+
+
+col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'coaching_outcome','emotions']
+
 try:
     ref_toshow = filtered_ref_df.iloc[:1][col].copy()
 except:

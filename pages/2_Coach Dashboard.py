@@ -86,7 +86,7 @@ st.markdown("#### Summary of Project Info")
 ref_toshow = filtered_ref_df.iloc[:1][['project_information', 'process', 'learning', 'obstacles', 'planning', 'emotions']].copy()
 
 
-col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'emotions']
+col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'coaching_outcome','emotions']
 try:
     ref_toshow = filtered_ref_df.iloc[:1][col].copy()
 except:
@@ -100,6 +100,7 @@ st.markdown('---')
 
 # section to show diagnosis 
 st.markdown("#### Diagnosis")
+st.markdown('Click on risks that you would like to discuss with the student.')
 list_diagnosed_risks = list(filtered_dia_df.columns)
 list_all_risks = list(risk_df.columns)
 list_stu_risks = list(filt_stu_dia_df.columns) if not filt_stu_dia_df.empty else {}
@@ -147,9 +148,9 @@ with st.expander('##### Other risks diagnosed by system'):
     for col in filtered_dia_df.columns:
         
         if col in list_all_risks and col not in list_stu_risks:
-            print("col:   ", col)
+            
             items = filtered_dia_df.iloc[0][col]
-            print("items:   ", items)
+            
             if isinstance(items, list):
                 diag = [col, items[0], items[1], items[2]]
                 dia_dict[col]=[items[0], items[1], items[2]]
@@ -174,9 +175,24 @@ with st.expander("##### All other risks in the framework"):
         if col not in list_diagnosed_risks:
             st.checkbox(":gray[ "+ col + ": " + risk_df.iloc[0][col] + ']', key=col)
 
-
+st.markdown('---')
 # area for coaches to add notes
 # st.markdown("#### Coaching Agenda / Notes")
+# agenda_data = load_data('coaches_notes')
+# if agenda_data:
+#     agenda_df = utils.format_agenda(agenda_data)
+#     print("Agenda df: ", agenda_df)
+#     print("Agenda DF columns: ", agenda_df.head())
+#     filt_agenda_df = agenda_df[agenda_df['full_name']==sel_stu]
+#     st.table(filt_agenda_df)
+# try:
+#     agenda_df = utils.format_data(agenda_data)
+#     filt_agenda_df = agenda_df[(agenda_df['full_name']==sel_stu) & (agenda_df['date']==sel_date)]
+#     st.table(filt_agenda_df)
+# except:
+#     st.markdown('No notes available for this student')
+
+# add new agenda item
 # risk_to_disucss = {}
 # for risk in list_diagnosed_risks or list_stu_risks:
 #     if risk in list_all_risks:
@@ -190,10 +206,11 @@ with st.expander("##### All other risks in the framework"):
 
 # with st.form('additional_risk'):
     
-#     stu_risk = st.text_input("Pick risks you would like to discuss and write down your notes below", "")
+#     stu_risk = st.text_input("Write down your notes or plan for the upcoming session below", "")
 #     submitted = st.form_submit_button("Submit")
+#     coaching_agenda = 
 #     if submitted:
-#         risk_to_disucss['student_submitted'] = stu_risk
+#         risk_to_disucss['Additional Notes'] = stu_risk
 #         risk_to_disucss['full_name'] = sel_stu
 #         risk_to_disucss['date'] = sel_date
 #         ref.child('coaches_notes').push().set(risk_to_disucss)

@@ -13,9 +13,11 @@ proj_Questions = {
     'learning':["The most useful and critical learning that the student has gained recently about any apsects of their venture, such as the problem, the effectiveness of their approach, or feedback from investors.",
                 "Is there any recent learning that has been extremely benefiical or critical for your venture?"],
     'obstacles':["Whether the student is currently experiencing any obstacles that they could use some help on from their coach.", 
-                 "Are you currently experiencing any obstacles or roadblocks that could use some help from your coach?"],
+                 "Are you currently experiencing any obstacles or roadblocks, or is there anything that is slowing you down?"],
     'planning':["Goals that the student plans to accomplish in the next few weeks to advance their project", 
                   "For the upcoming two weeks, what do you plan to accomplish to advance your project?"],
+    'coaching_outcome':["Specific outcome that the student is looking to achieve through their next session with Brylan", 
+                        "Looking ahead, what is a success metric that will make your next coaching session with Brylan worthwile to you? "],
     'emotions':["Emotions that the student might be feeling with their experience working on their venture, such as feeling stressed, motivated, discouraged, etc. ", 
                 "How have you been feeling for the past few weeks while working on your project and working through this obstacle? excited? confused? discouraged?"]
 }
@@ -67,6 +69,11 @@ class ProjectSchema(BaseModel):
     planning: Optional[str] = Field(
         None,
         description= """Goals that the student plans to accomplish in the next few weeks to advance their project."""
+    )
+
+    coaching_outcome: Optional[str] = Field(
+        None,
+        description="""Specific outcome that the student is looking to achieve through the upcoming coaching session with Brylan"""
     )
 
     emotions: Optional[str] = Field(

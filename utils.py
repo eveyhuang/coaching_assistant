@@ -34,6 +34,15 @@ def format_reflection(data):
 
     return dft
 
+def format_agenda(data):
+    df = pd.DataFrame.from_dict(data)
+    dft = df.T
+    # convert datetime and sort dataframe based on time
+    # dft= dft.iloc[pd.to_datetime(dft['date']).argsort()[::-1]]
+    # create a new oclumn called 'date'
+    
+
+    return dft
 def format_data(data):
     df = pd.json_normalize(data)
     df = df.dropna()
