@@ -6,7 +6,7 @@ langsmith
 langchain_openai
 pandas
 numpy
-
+itertools
 pydantic==2.6.0
 
 streamlit_dynamic_filters

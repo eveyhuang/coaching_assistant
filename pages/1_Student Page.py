@@ -97,7 +97,7 @@ for label, tab in zip(tab_labels, tabs):
         st.markdown(":green[**Your Response:** " +dia_dict[label][2] + ']')
 
 st.markdown('---')
-st.markdown('##### Other risks to consider')
+st.markdown('##### Other general risks to consider')
 with st.expander("Click on risks that you would like to discuss with your coach in your next session."):
     
     for col in list_all_risks:

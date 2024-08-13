@@ -6,7 +6,7 @@ import utils
 import llm_chains
 import schema
 import json
-
+import itertools
 
 
 app = utils.init_app()
@@ -45,13 +45,21 @@ proj_question_chain = llm_chains.proj_question_chain
 
 # run LLM to formulate a question
 def ask_for_info(chain, history, human_input, previous_goal, item, description, example):
-    try:
-        question = chain.invoke({"history": history, "human_input":human_input, "previous_goal":previous_goal, "item": item, "description": description, "example":example})
-        return question
-    except:
-        print("Encountered errors when asking about ", item)
-        print("history  : ", history)
-        return example
+    retry_count = itertools.count()
+    while True:
+        try:
+            question = chain.invoke({"history": history, "human_input":human_input, "previous_goal":previous_goal, "item": item, "description": description, "example":example})
+            return question
+        except:
+            if next(retry_count) <= 5:
+                print("Rrtry API call, trial number ", retry_count)
+                time.sleep(5)
+                continue
+            else:
+                print("Encountered errors when asking about ", item)
+                print("history  : ", history)
+                return example
+        
 
 # based on tagged data check what items are left to ask
 def check_what_is_empty(user_peronal_details):
@@ -74,7 +82,7 @@ def add_non_empty_details(current_details: schema.ProjectSchema, new_details: sc
                     if copied.__dict__[k] in [None, "", False]:
                         copied.__dict__[k] = v
                     elif v not in copied.__dict__[k]:
-                        print("UPDATE: adding to [ " + k + " ] with: [ " + v + " ]")
+                        # print("UPDATE: adding to [ " + k + " ] with: [ " + v + " ]")
                         copied.__dict__[k] += " " + v
     # updated_details = current_details
     except:
@@ -92,21 +100,33 @@ def filter_response(tagging_chain, text_input, user_details):
     # print("**  after tagging: ", res)
     user_details = add_non_empty_details(user_details, res)
 
-    print("**** Newest user detail: ", user_details)
+    # print("**** Newest user detail: ", user_details)
     ask_for = check_what_is_empty(user_details)
-    print("Remaining qs to ask for: ", ask_for)
+    # print("Remaining qs to ask for: ", ask_for)
     return user_details, ask_for
     
 
 # summarize data in user details
 def summarize_all_details(user_details):
     name = ''
+    retry_count = itertools.count()
     copied = user_details.copy() 
     for k, v in user_details.dict().items():
         if k == 'full_name':
             name = copied.__dict__[k]
         else:
-            copied.__dict__[k] = llm_chains.summary_chain.invoke({"information": v, "name": name})
+            while True:
+                try:
+                    copied.__dict__[k] = llm_chains.summary_chain.invoke({"information": v, "name": name})
+                except:
+                    if next(retry_count) <= 5:
+                        print("Rrtry API call, trial number ", retry_count)
+                        time.sleep(5)
+                        continue
+                    else: 
+                        copied.__dict__[k] = v
+                break
+
     # updated_details = current_details
     return copied 
 
@@ -132,9 +152,6 @@ def savedata(all_info, data, location):
 # and a pair of value (reasoning for diagnosis, a question to ask)
 def get_risk_library(diagnosis):
     risk_library = {}
-    # print(type(diagnosis), diagnosis)
-
-    # print("CALLING get_prevgoals with: " + name )
     
     if not isinstance(diagnosis, dict):
         diagnosis = json.loads(diagnosis.replace("'", "\""))
@@ -164,12 +181,19 @@ def diagnose(user_details):
 #   cat_list = ast.literal_eval(category)
 #   risk_area = [schema.risk_model[k] for k in cat_list]
     risk_framework = get_risk_framework()
+    retry_count = itertools.count()
     diagnosis = None
-    try:
-        diagnosis = llm_chains.diagnose_chain.invoke({"input": user_details, "risk": risk_framework})
-    except:
-        diagnosis = 'Sorry there was some technical error. Could you please try to refresh the page?'
-           
+    while True:
+        try:
+            diagnosis = llm_chains.diagnose_chain.invoke({"input": user_details, "risk": risk_framework})
+        except:
+            if next(retry_count) <= 5:
+                print("Rrtry API call, trial number ", retry_count)
+                time.sleep(5)
+                continue
+            else:
+                diagnosis = 'Sorry there was some technical error. Could you please try to refresh the page?'
+        break   
     
     return diagnosis
 
@@ -194,7 +218,7 @@ def getdetails(dict, item, pos):
         if pos==0:
             return 'Full name of the user'
         else:
-            return 'Could you tell me what is your name?'
+            return 'Before we dive in, could you tell me what is your name?'
     else:
         return dict[item][pos]
 
@@ -274,12 +298,13 @@ if answer := st.chat_input("Please type your response here. "):
                 st.session_state.diagnosis_library[st.session_state.last_risk].append(answer)
             
             if st.session_state.risks != []:
-                print("diagnosed risks: ", st.session_state.risks)
+                # print("diagnosed risks: ", st.session_state.risks)
                 num_risks = len(st.session_state.risks)
                 risk = st.session_state.risks[0]
                 st.session_state.last_risk = risk
                 reason_qs = st.session_state.diagnosis_library[risk]
                 print("next risk to ask about: ", risk, reason_qs)
+                
                 next_question = llm_chains.diag_qa_chain.invoke({ "question": reason_qs[1], "risk": reason_qs[0], "history":st.session_state.messages[-3:], "human_input": answer})  
                 assistant_response = next_question
                 st.session_state.risks.pop(0)
