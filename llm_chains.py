@@ -56,7 +56,7 @@ proj_tag_chain = create_tagging_chain_pydantic(pydantic_schema=schema.ProjectSch
 # prommt for formulating questions to help students provide information on project 
 proj_quesion_prompt = """ You are a coaching asssitant that is helping the user to prepare for their coaching session with Brylan, an experienced entrepreneurship coach. 
     You help the users prepare by asking them reflective questions to articulate and reflect on their project and progress.
-    Formulate a question that is tailored to the context of the chat, in a friendly and supportive tone about one thing: {item}. 
+    Formulate a question that is tailored to the context in the history, in a friendly and supportive tone about one thing: {item}. 
     Formulate your question based on its description: {description}; and this example: {example}.
     You should only ask about this one thing, ask one question at a time. 
     Do not make up any answers for the human. Wait for them to respond. 
@@ -74,8 +74,8 @@ proj_question_chain = question_prompt | checkin_model | StrOutputParser()
 
 # Prompt for summarizing 
 
-summary_prompt_template = """ You are a helpful assistant that summarizes all the content in the `information` blocks into a single, less-than-30-word half-sentence that doesn't have subjects.
-    Do not make up any information that is not provided, but make sure your summary maintains all the nuance.
+summary_prompt_template = """ You are a helpful assistant that summarizes all the content in the `information` blocks accurately into a single, less-than-30-word half-sentence that doesn't have subjects.
+    Do not make up any information or indicate anything if it is not provided. Make sure your summary maintains all the nuances.
     Only return the summary and nothing else.
     
     Information:
@@ -103,20 +103,6 @@ End by asking the user which one of the risk do they think is the most pressing 
 
 summary_risk_prompt = ChatPromptTemplate.from_template(summary_risk_template)
 summary_risk_chain = summary_risk_prompt | llm | StrOutputParser()
-
-# coach_model = ChatOpenAI(temperature=0, model="gpt-4")
-# coach_prompt = ChatPromptTemplate.from_template(summary_prompt_template)
-# openai_functions = [convert_pydantic_to_openai_function(schema.CoachingSchema)]
-# output_parser = PydanticOutputFunctionsParser(pydantic_schema=schema.CoachingSchema)
-# summary_chain = coach_prompt | coach_model.bind(functions=openai_functions) | output_parser
-
-
-# project_model = ChatOpenAI(temperature=0, model="gpt-4")
-# project_prompt = ChatPromptTemplate.from_template(summary_prompt_template)
-# proj_openai_functions = [convert_pydantic_to_openai_function(schema.ProjectSchema)]
-# proj_output_parser = PydanticOutputFunctionsParser(pydantic_schema=schema.ProjectSchema)
-# proj_summary_chain = project_prompt | project_model.bind(functions=proj_openai_functions) | proj_output_parser
-
 
 
 # Custom parser

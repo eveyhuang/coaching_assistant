@@ -100,7 +100,7 @@ def filter_response(tagging_chain, text_input, user_details):
     # print("**  after tagging: ", res)
     user_details = add_non_empty_details(user_details, res)
 
-    # print("**** Newest user detail: ", user_details)
+    print("**** Newest user detail: ", user_details)
     ask_for = check_what_is_empty(user_details)
     # print("Remaining qs to ask for: ", ask_for)
     return user_details, ask_for
@@ -251,9 +251,10 @@ for message in st.session_state.messages:
 
 if answer := st.chat_input("Please type your response here. "):
     # Add user message to chat history
+    answer = answer.replace(';', '.')
     st.session_state.messages.append({"role": "user", "content": answer})
     if "prev_goals" not in st.session_state:
-        st.session_state.prev_goals = get_prevgoals(answer)
+        st.session_state.prev_goals = ''
     # Display user message in chat message container
     with st.chat_message("user"):
         st.markdown(answer)
@@ -322,6 +323,7 @@ if answer := st.chat_input("Please type your response here. "):
                 
                 final_details = summarize_all_details(st.session_state.details)
                 final_details = final_details.dict()
+                print("Final details: ", final_details)
                 
                 savedata(final_details, st.session_state.diagnosis_library, 'diagnosis')
                 savedata(final_details, final_details, 'check_in')
