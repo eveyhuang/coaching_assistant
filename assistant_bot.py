@@ -249,6 +249,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
+
 if answer := st.chat_input("Please type your response here. "):
     # Add user message to chat history
     answer = answer.replace(';', '.')
