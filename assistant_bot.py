@@ -339,7 +339,7 @@ if answer := st.chat_input("Please type your response here. "):
                 st.session_state.mode = 'summarize'
                 st.session_state.last_risk = ''
                 assistant_response = """Thank you for answering all of my questions.  \n
-                                        Please navigate to your personal page for a summary of my diagnosis, and choose ones that you think are the most relevant to discuss during your next coaching session.
+                                        Please navigate to the student page for a summary of my diagnosis, and choose risks that you would like to discuss with your coach during the next session.
                                     """
                 
 
