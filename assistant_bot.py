@@ -100,7 +100,7 @@ def filter_response(tagging_chain, text_input, user_details):
     # print("**  after tagging: ", res)
     user_details = add_non_empty_details(user_details, res)
 
-    print("**** Newest user detail: ", user_details)
+    # print("**** Newest user detail: ", user_details)
     ask_for = check_what_is_empty(user_details)
     # print("Remaining qs to ask for: ", ask_for)
     return user_details, ask_for
