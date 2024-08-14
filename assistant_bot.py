@@ -82,7 +82,7 @@ def add_non_empty_details(current_details: schema.ProjectSchema, new_details: sc
                     if copied.__dict__[k] in [None, "", False]:
                         copied.__dict__[k] = v
                     elif v not in copied.__dict__[k]:
-                        # print("UPDATE: adding to [ " + k + " ] with: [ " + v + " ]")
+                        
                         copied.__dict__[k] += " " + v
     # updated_details = current_details
     except:
@@ -114,6 +114,8 @@ def summarize_all_details(user_details):
     for k, v in user_details.dict().items():
         if k == 'full_name':
             name = copied.__dict__[k]
+        elif k == 'coaching_outcome':
+            copied.__dict__[k] = v
         else:
             while True:
                 try:
@@ -222,6 +224,21 @@ def getdetails(dict, item, pos):
     else:
         return dict[item][pos]
 
+#update progress as questions left that the user needs to answer as a percent progress
+def get_progress(total_Q):
+    check_qs = len(st.session_state.ask_for)
+    if len(st.session_state.risks)>0:
+        diag_qs = len(st.session_state.risks)
+    elif len(st.session_state.ask_for)== 0 & len(st.session_state.risks)==0:
+        diag_qs = 0
+    else:
+        diag_qs = 3            
+    q_left = check_qs+diag_qs
+    prog = ((total_Q-q_left)/total_Q)
+    return prog
+
+
+
 if "messages" not in st.session_state:
     question = "Hello, I am here to help you prepare for your next coaching session.  \n  \nOur conversation will be summarized and shown to your coach before your next session.  \n  \n To get started, please tell me your name and what your venture is about: what is the user problem or market needs you are trying to tackle, and what is your proposed solution?"
     st.session_state.messages = [{"role":"assistant", "content":question}]
@@ -249,7 +266,13 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
+if "prog" not in st.session_state:
+    st.session_state.prog = 0
 
+if "total_Q" not in st.session_state:
+    st.session_state.total_Q = len(st.session_state.ask_for) + 4
+
+  
 if answer := st.chat_input("Please type your response here. "):
     # Add user message to chat history
     answer = answer.replace(';', '.')
@@ -259,7 +282,8 @@ if answer := st.chat_input("Please type your response here. "):
     # Display user message in chat message container
     with st.chat_message("user"):
         st.markdown(answer)
-
+    
+    
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
@@ -334,14 +358,16 @@ if answer := st.chat_input("Please type your response here. "):
         else:
             assistant_response = """Thank you for answering all of my questions.
                                  """
-        
-            
+        prog_bar= st.progress(st.session_state.prog)
+        st.session_state.prog = get_progress(st.session_state.total_Q)
+        prog_bar.progress(st.session_state.prog ) 
         for chunk in assistant_response.split():
             full_response += chunk + " "
             time.sleep(0.05)
             # Add a blinking cursor to simulate typing
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-        
+    
     # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": full_response})
+    
