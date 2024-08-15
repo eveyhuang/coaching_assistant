@@ -36,7 +36,16 @@ risk_model = {
 }
 
 
-# Schema for all the reflectiev questions to ask students
+# framework for type of questions 
+q_framework = """(1) Speculative; this type of questions asks what ifs to reframe the problem or explore more-creative solutions.
+
+(2) Productive; this type of questions asks about now what? it helps one assess the availability of talent, capabilities, time, and other resources. 
+
+(3) Interpretive;  Interpretive questions or sensemaking questions enable synthesis. They push one to continually redefine the core issue to go beneath the surface and ask, “What is this problem really about?”. They come in other forms, too: “What did we learn from this?” “How is that useful?” “Are these the right questions to ask?”
+
+(4) Subjective; this type of questions investigates what is unsaid; it deals with the personal reservations, frustrations, tensions, and hidden agendas that can push decision-making off course.
+
+(5) Investigative; this type of questions investigates what is known to dig ever deeper to generate nonobvious information."""
 
 # schema for asking students questions to provide information on projects 
 class ProjectSchema(BaseModel):

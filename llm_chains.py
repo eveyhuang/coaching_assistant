@@ -70,7 +70,17 @@ proj_quesion_prompt = """ You are a coaching asssitant that is helping the user 
 question_prompt = ChatPromptTemplate.from_template(proj_quesion_prompt)
 proj_question_chain = question_prompt | checkin_model | StrOutputParser()
 
+#prompt for generating questions coaches could ask
+coach_Q_prompt_template="""You are an experienced entrepreneur who is assisting the human user, an entrepreneur coach, 
+to think about what questions the human user should ask during the next coaching session with his students. 
+Based on information about the student's project: {information}; and diagnosis of possible risks in the student's project: {diagnosis}, 
+generate 5 questions the human could ask the student. 
+Make sure these 5 questions cover all of the types of questions in this framework: {framework}.
+Start your response with "Here are some questions to consider:" before showing the questions.
+Questions should each be in a bullet point and a new paragraph, and each starting with the type of question it belongs. Do not include any other information."""
 
+coach_Q_prompt = ChatPromptTemplate.from_template(coach_Q_prompt_template)
+coach_question_chain = coach_Q_prompt | llm | StrOutputParser()
 
 # Prompt for summarizing 
 

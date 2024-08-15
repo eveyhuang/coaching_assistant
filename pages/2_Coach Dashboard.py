@@ -5,6 +5,8 @@ import numpy as np
 from streamlit_dynamic_filters import DynamicFilters
 import hmac
 from datetime import datetime
+import schema
+import llm_chains
 
 def check_password():
     """Returns `True` if the user had the correct password."""
@@ -48,6 +50,31 @@ def load_data(collection):
     data = ref.child(collection).get()    
     return data
 
+# use llm to generate questions based on project info and chosen risks to discuss
+def generate_Qs(project_info, risk_to_discuss):
+    chosen_risks={}
+    if len(risk_to_discuss["Risks"])>0:
+        for risks in risk_to_discuss["Risks"]:
+            if risks in stu_dia_dict.keys():
+                if not isinstance(stu_dia_dict[risks], list):
+                    chosen_risks[risks] = stu_dia_dict[risks]
+                else:
+                    chosen_risks[risks] = stu_dia_dict[risks][0]
+            elif risks in dia_dict.keys():
+                if not isinstance(dia_dict[risks], list):
+                    chosen_risks[risks] = dia_dict[risks]
+                else:
+                    chosen_risks[risks] = dia_dict[risks][0]
+            else:
+                chosen_risks['student notes'] = risks
+    framework = schema.q_framework
+    q_chain = llm_chains.coach_question_chain
+    try:
+        response = q_chain.invoke({"information": project_info, "diagnosis": chosen_risks, "framework": framework})
+        return response
+    except:
+        return "Sorry, I am having some technical issues, please try again later."
+    
 # load and save reflection df
 reflection_data = load_data('check_in')
 reflection_df = utils.format_reflection(reflection_data)
@@ -125,11 +152,10 @@ if not filtered_dia_df.empty:
                     list_stu_risks.remove(col)
             elif col == "student_submitted":  
                 items = filt_stu_dia_df.iloc[0][col]
-                # print("student submitted:    ", items)
                 if len(items)>0:
                     stu_dia_dict['notes_from_student'] = items 
-                    # st.session_state.student_submitted = items
-    # print("******* STU DIA DICT:     ", stu_dia_dict)
+                   
+
     # display students' diagnosed risks in tabs
     stu_tab_labels = list(stu_dia_dict.keys())
     if len(stu_tab_labels)>0:
@@ -137,11 +163,11 @@ if not filtered_dia_df.empty:
         for label, tab in zip(stu_tab_labels, tabs):
             with tab:
                 if isinstance(stu_dia_dict[label], list):
-                    st.checkbox(":gray-background[Risk: "+ stu_dia_dict[label][0]+']', key=label)
+                    st.checkbox(":gray-background["+ stu_dia_dict[label][0]+']', key=label)
                     st.markdown(":blue[**Question Asked:** "+stu_dia_dict[label][1] + ']')
                     st.markdown(":green[**Student's Response:** " +stu_dia_dict[label][2] + ']')
                 else: 
-                    st.checkbox(":gray-background[Risk: "+ stu_dia_dict[label]+']', key=label)
+                    st.checkbox(":gray-background["+ stu_dia_dict[label]+']', key=label)
     else:
         st.markdown(":red[The student has not conducted any diagnosis yet.]")
 
@@ -193,15 +219,15 @@ if not filtered_dia_df.empty:
             except:
                 print("Error showing coaching notes")
 
-   
+    # this is for saving to coaching agenda
     risk_to_disucss = {}
+    # this is for generating questions, have more details
     
     for risk in list_diagnosed_risks:
-
         if risk in list_all_risks:
             is_clicked = st.session_state[risk]
             if is_clicked:
-                st.markdown("* " +risk )
+                st.markdown("* " +risk)
                 try:
                     risk_to_disucss['Risks'].append(risk)
                 except:
@@ -211,7 +237,7 @@ if not filtered_dia_df.empty:
         if (risk not in list_diagnosed_risks) & (risk in list_all_risks):
             is_clicked = st.session_state[risk]
             if is_clicked:
-                st.markdown("* " +risk )
+                st.markdown("* " +risk)
                 try:
                     risk_to_disucss['Risks'].append(risk)
                 except:
@@ -227,10 +253,13 @@ if not filtered_dia_df.empty:
                     except:
                         risk_to_disucss['Risks'] = [stu_risk]
                 
+    if st.button('Suggest questions based on the chosen risks'):
+        questions = generate_Qs(ref_toshow.to_dict(), risk_to_disucss)
+        st.markdown(questions)
 
     with st.form('additional_risk'):
         
-        stu_risk = st.text_input("Write down your notes or plan for the upcoming session below", "")
+        stu_risk = st.text_input("Notes", "")
         submitted = st.form_submit_button("Submit")
         
         if submitted:
@@ -240,4 +269,6 @@ if not filtered_dia_df.empty:
             risk_to_disucss['date'] = datetime.today().strftime('%Y-%m-%d')
             ref.child('coaches_notes').push().set(risk_to_disucss)
             st.write("Agenda saved! Thank you.")
-            
+    
+    
+    
