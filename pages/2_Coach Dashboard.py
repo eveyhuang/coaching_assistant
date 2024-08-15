@@ -30,8 +30,8 @@ def check_password():
     return False
 
 
-if not check_password():
-    st.stop()  # Do not continue if check_password is not True.
+# if not check_password():
+#     st.stop()  # Do not continue if check_password is not True.
 
 app = utils.init_app()
 ref = utils.init_db()
@@ -78,10 +78,10 @@ sel_stu = filtered_ref_df.iloc[0]['full_name']
 sel_date = filtered_ref_df.iloc[0]['date']
 filtered_dia_df = diagnosis_df[(diagnosis_df['full_name']==sel_stu) & (diagnosis_df['date']==sel_date)]
 filt_stu_dia_df = stu_dia_df[(stu_dia_df['full_name']==sel_stu) & (stu_dia_df['date']==sel_date)]
+filt_stu_dia_df.sort_values('date', ascending=False)
 
 if not filtered_dia_df.empty:
     st.markdown('### ' + sel_stu)
-
 
     # section to display the most recent reflection
     st.markdown("#### Summary of Project Info")
@@ -106,13 +106,14 @@ if not filtered_dia_df.empty:
     list_diagnosed_risks = list(filtered_dia_df.columns)
     list_all_risks = list(risk_df.columns)
     list_stu_risks = list(filt_stu_dia_df.columns) if not filt_stu_dia_df.empty else {}
-
+    
     st.markdown('##### Risks chosen by student')
 
     # build a dictionary of risks chosen by students
     stu_dia_dict = {}
     if not filt_stu_dia_df.empty:
         for col in filt_stu_dia_df.columns:
+            # print("NEXT COLUMN:    ", col)
             if col in list_all_risks:
                 items = filt_stu_dia_df.iloc[0][col]
                 if isinstance(items, list):
@@ -124,9 +125,11 @@ if not filtered_dia_df.empty:
                     list_stu_risks.remove(col)
             elif col == "student_submitted":  
                 items = filt_stu_dia_df.iloc[0][col]
+                # print("student submitted:    ", items)
                 if len(items)>0:
-                    stu_dia_dict['Other risks identified by student'] = items 
-
+                    stu_dia_dict['notes_from_student'] = items 
+                    # st.session_state.student_submitted = items
+    # print("******* STU DIA DICT:     ", stu_dia_dict)
     # display students' diagnosed risks in tabs
     stu_tab_labels = list(stu_dia_dict.keys())
     if len(stu_tab_labels)>0:
@@ -190,17 +193,11 @@ if not filtered_dia_df.empty:
             except:
                 print("Error showing coaching notes")
 
-    # try:
-    #     agenda_df = utils.format_data(agenda_data)
-    #     filt_agenda_df = agenda_df[(agenda_df['full_name']==sel_stu) & (agenda_df['date']<=datetime.today().strftime('%Y-%m-%d'))]
-    #     st.table(filt_agenda_df)
-    # except:
-    #     st.markdown('No notes available for this student')
-
-    # add new agenda item
+   
     risk_to_disucss = {}
+    
+    for risk in list_diagnosed_risks:
 
-    for risk in list_diagnosed_risks or list_stu_risks:
         if risk in list_all_risks:
             is_clicked = st.session_state[risk]
             if is_clicked:
@@ -209,6 +206,26 @@ if not filtered_dia_df.empty:
                     risk_to_disucss['Risks'].append(risk)
                 except:
                     risk_to_disucss['Risks'] = [risk]
+      
+    for risk in list_stu_risks:
+        if (risk not in list_diagnosed_risks) & (risk in list_all_risks):
+            is_clicked = st.session_state[risk]
+            if is_clicked:
+                st.markdown("* " +risk )
+                try:
+                    risk_to_disucss['Risks'].append(risk)
+                except:
+                    risk_to_disucss['Risks'] = [risk]
+        elif risk == 'student_submitted':
+            if "notes_from_student" in stu_dia_dict.keys():
+                stu_risk = stu_dia_dict['notes_from_student']
+                is_clicked = st.session_state['notes_from_student']
+                if is_clicked:
+                    st.markdown("* " + stu_risk)
+                    try:
+                        risk_to_disucss['Risks'].append(stu_risk)
+                    except:
+                        risk_to_disucss['Risks'] = [stu_risk]
                 
 
     with st.form('additional_risk'):
