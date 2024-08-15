@@ -53,28 +53,31 @@ def load_data(collection):
 # use llm to generate questions based on project info and chosen risks to discuss
 def generate_Qs(project_info, risk_to_discuss):
     chosen_risks={}
-    if len(risk_to_discuss["Risks"])>0:
-        for risks in risk_to_discuss["Risks"]:
-            if risks in stu_dia_dict.keys():
-                if not isinstance(stu_dia_dict[risks], list):
-                    chosen_risks[risks] = stu_dia_dict[risks]
-                else:
-                    chosen_risks[risks] = stu_dia_dict[risks][0]
-            elif risks in dia_dict.keys():
-                if not isinstance(dia_dict[risks], list):
-                    chosen_risks[risks] = dia_dict[risks]
-                else:
-                    chosen_risks[risks] = dia_dict[risks][0]
-            else:
-                chosen_risks['student notes'] = risks
     framework = schema.q_framework
     q_chain = llm_chains.coach_question_chain
+    if "Risks" in risk_to_discuss.keys():
+        if len(risk_to_discuss["Risks"])>0:
+            for risks in risk_to_discuss["Risks"]:
+                if risks in stu_dia_dict.keys():
+                    if not isinstance(stu_dia_dict[risks], list):
+                        chosen_risks[risks] = stu_dia_dict[risks]
+                    else:
+                        chosen_risks[risks] = stu_dia_dict[risks][0]
+                elif risks in dia_dict.keys():
+                    if not isinstance(dia_dict[risks], list):
+                        chosen_risks[risks] = dia_dict[risks]
+                    else:
+                        chosen_risks[risks] = dia_dict[risks][0]
+                else:
+                    chosen_risks['student notes'] = risks
+    else:
+        chosen_risks = stu_dia_dict
     try:
         response = q_chain.invoke({"information": project_info, "diagnosis": chosen_risks, "framework": framework})
         return response
     except:
         return "Sorry, I am having some technical issues, please try again later."
-    
+
 # load and save reflection df
 reflection_data = load_data('check_in')
 reflection_df = utils.format_reflection(reflection_data)
