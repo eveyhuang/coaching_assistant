@@ -240,7 +240,7 @@ def get_progress(total_Q):
 
 
 if "messages" not in st.session_state:
-    question = "Hello, I am here to help you prepare for your next coaching session.  \n  \nOur conversation will be summarized and shown to your coach before your next session.  \n  \n To get started, please tell me your name and what your venture is about: what is the user problem or market needs you are trying to tackle, and what is your proposed solution?"
+    question = "Hello, I am here to help you prepare for your next coaching session.  \n  \n I will ask you a series of questions to try to get a whole picture of your venture and your progress. Our conversation will be summarized and shown to your coach before your next session.  \n  \n To get started, please tell me your name and what your venture is about: what is the user problem or market needs you are trying to tackle, and what is your proposed solution?"
     st.session_state.messages = [{"role":"assistant", "content":question}]
     
 # default state should be reflections. but it can change    
