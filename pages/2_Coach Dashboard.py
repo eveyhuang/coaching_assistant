@@ -73,6 +73,7 @@ def generate_Qs(project_info, risk_to_discuss):
     else:
         chosen_risks = stu_dia_dict
     try:
+        print("Suggesting questions for    :", chosen_risks)
         response = q_chain.invoke({"information": project_info, "diagnosis": chosen_risks, "framework": framework})
         return response
     except:

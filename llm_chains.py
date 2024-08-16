@@ -73,11 +73,13 @@ proj_question_chain = question_prompt | checkin_model | StrOutputParser()
 #prompt for generating questions coaches could ask
 coach_Q_prompt_template="""You are an experienced entrepreneur who is assisting the human user, an entrepreneur coach, 
 to think about what questions the human user should ask during the next coaching session with his students. 
-Based on information about the student's project: {information}; and diagnosis of possible risks in the student's project: {diagnosis}, 
-generate 5 questions the human could ask the student. 
-Make sure these 5 questions cover all of the types of questions in this framework: {framework}.
+Based on information about the student's project: {information}; 
+For each risk in {diagnosis}, generate one question that is on-obvious (something not considered before by anyone), meta that could help the student to have a aha moment. 
+Each question should be concise, conversational, use simple language, and be hyper focused on something that the student can do today (instead of future scenarios).
+Make sure the questions belong to different types in this framework: {framework}.
+Make sure all your questions are very different from each other and touch on different aspects of the student's project.
 Start your response with "Here are some questions to consider:" before showing the questions.
-Questions should each be in a bullet point and a new paragraph, and each starting with the type of question it belongs. Do not include any other information."""
+Questions should each be in a bullet point and a new paragraph, and each starting with the risk it belongs. Do not include any other information."""
 
 coach_Q_prompt = ChatPromptTemplate.from_template(coach_Q_prompt_template)
 coach_question_chain = coach_Q_prompt | llm | StrOutputParser()
