@@ -38,6 +38,8 @@ if not check_password():
 app = utils.init_app()
 ref = utils.init_db()
 
+if "coaching_goals" not in st.session_state:
+    st.session_state.coaching_goals = ""
 
 st.set_page_config(
     page_title='Coaching Dahsboard / Individual View',
@@ -45,13 +47,12 @@ st.set_page_config(
 )
 
 # load data from ref and do some manipulations 
-
 def load_data(collection):
     data = ref.child(collection).get()    
     return data
 
 # use llm to generate questions based on project info and chosen risks to discuss
-def generate_Qs(project_info, risk_to_discuss):
+def generate_Qs(project_info, risk_to_discuss, coaching_outcome):
     chosen_risks={}
     framework = schema.q_framework
     q_chain = llm_chains.coach_question_chain
@@ -59,10 +60,7 @@ def generate_Qs(project_info, risk_to_discuss):
         if len(risk_to_discuss["Risks"])>0:
             for risks in risk_to_discuss["Risks"]:
                 if risks in stu_dia_dict.keys():
-                    if not isinstance(stu_dia_dict[risks], list):
-                        chosen_risks[risks] = stu_dia_dict[risks]
-                    else:
-                        chosen_risks[risks] = stu_dia_dict[risks][0]
+                    chosen_risks[risks] = stu_dia_dict[risks]
                 elif risks in dia_dict.keys():
                     if not isinstance(dia_dict[risks], list):
                         chosen_risks[risks] = dia_dict[risks]
@@ -72,9 +70,10 @@ def generate_Qs(project_info, risk_to_discuss):
                     chosen_risks['student notes'] = risks
     else:
         chosen_risks = stu_dia_dict
+    
     try:
-        print("Suggesting questions for    :", chosen_risks)
-        response = q_chain.invoke({"information": project_info, "diagnosis": chosen_risks, "framework": framework})
+        print("Suggesting questions for risks :", chosen_risks)
+        response = q_chain.invoke({"information": project_info, "diagnosis": chosen_risks, "framework": framework, "outcome": coaching_outcome})
         return response
     except:
         return "Sorry, I am having some technical issues, please try again later."
@@ -168,8 +167,8 @@ if not filtered_dia_df.empty:
             with tab:
                 if isinstance(stu_dia_dict[label], list):
                     st.checkbox(":gray-background["+ stu_dia_dict[label][0]+']', key=label)
-                    st.markdown(":blue[**Question Asked:** "+stu_dia_dict[label][1] + ']')
-                    st.markdown(":green[**Student's Response:** " +stu_dia_dict[label][2] + ']')
+                    st.markdown(":blue[**Question:** "+stu_dia_dict[label][1] + ']')
+                    st.markdown(":green[ **Response:**]" + ":green[ " +stu_dia_dict[label][2] + ']')
                 else: 
                     st.checkbox(":gray-background["+ stu_dia_dict[label]+']', key=label)
     else:
@@ -197,9 +196,9 @@ if not filtered_dia_df.empty:
             tabs = st.tabs(sys_tab_labels)
             for label, tab in zip(sys_tab_labels, tabs):
                 with tab:
-                    st.checkbox(":gray-background[Risk: "+ dia_dict[label][0]+']', key=label)
+                    st.checkbox(":gray-background["+ dia_dict[label][0]+']', key=label)
                     st.markdown(":blue[**Question Asked:** "+dia_dict[label][1] + ']')
-                    st.markdown(":green[**Student's Response:** " +dia_dict[label][2] + ']')
+                    st.markdown(":green[ **Response:**]" + ":green[ " +dia_dict[label][2] + ']')
         else:
             st.markdown('---')
 
@@ -257,22 +256,25 @@ if not filtered_dia_df.empty:
                     except:
                         risk_to_disucss['Risks'] = [stu_risk]
                 
-    if st.button('Suggest questions based on the chosen risks'):
-        questions = generate_Qs(ref_toshow.to_dict(), risk_to_disucss)
-        st.markdown(questions)
+   
 
     with st.form('additional_risk'):
         
-        stu_risk = st.text_input("Notes", "")
-        submitted = st.form_submit_button("Submit")
+        stu_risk = st.text_input("Write down desired coaching outcomes below, and the system will suggest questions you could ask based on the outcomes and chosen risks.", "")
+        submitted = st.form_submit_button("Submit and see suggestted questions")
         
         if submitted:
             
             risk_to_disucss['Notes'] = stu_risk
+            st.session_state.coaching_goals = stu_risk
             risk_to_disucss['full_name'] = sel_stu
             risk_to_disucss['date'] = datetime.today().strftime('%Y-%m-%d')
-            ref.child('coaches_notes').push().set(risk_to_disucss)
-            st.write("Agenda saved! Thank you.")
-    
+            # ref.child('coaches_notes').push().set(risk_to_disucss)
+            # st.write("Agenda saved! Thank you.")
+
+            questions = generate_Qs(ref_toshow.to_dict(), risk_to_disucss, st.session_state.coaching_goals)
+            st.markdown(questions)    
+
+         
     
     

@@ -44,7 +44,7 @@ checkin_model = llm
 tagging_template = """ Extract the desired information about the user from the following conversation between an assistant and the user in the input below.
                     Use the question asked by the assistant as context, extract properties that match the descriptions closely in the 'information_extraction' function from user's response.
                     Extract as many relevant properties as possible at once, but do NOT make up any information.     
-                    When extracting properties, rephrase and summarize it into short and coherent sentences and fix any typos or grammar errors.  
+                    When extracting properties, rephrase it into short, concise sentences with simple language and fix any typos or grammar errors.  
                     Conversation:
                     {input}
                     """
@@ -71,24 +71,38 @@ question_prompt = ChatPromptTemplate.from_template(proj_quesion_prompt)
 proj_question_chain = question_prompt | checkin_model | StrOutputParser()
 
 #prompt for generating questions coaches could ask
-coach_Q_prompt_template="""You are an experienced entrepreneur who is assisting the human user, an entrepreneur coach, 
-to think about what questions the human user should ask during the next coaching session with his students. 
-Based on information about the student's project: {information}; 
-For each risk in {diagnosis}, generate one question that is on-obvious (something not considered before by anyone), meta that could help the student to have a aha moment. 
-Each question should be concise, conversational, use simple language, and be hyper focused on something that the student can do today (instead of future scenarios).
-Make sure the questions belong to different types in this framework: {framework}.
-Make sure all your questions are very different from each other and touch on different aspects of the student's project.
+coach_Q_prompt_template="""You are an experienced entrepreneur who is assisting the human user, an experienced coach to come up with questions to ask a novice entrepreneur during the next coaching session.
+Use information about the novice's project in the 'information' block as your context,
+for each risk in the 'diagnosis' block, generate one question that the coach could ask the novice to achieve the desired outcome in the 'outcome' block. 
+
+Requirements for your questions:
+1. Make sure the question is non-obvious (something that the novice has not considered before) based on project information and what has already been asked and answered in the diagnosis.
+2. Each question should use simple language, be concise, conversational, and hyper focused on something that the novice can do today.
+3. Make sure the question belongs to the best suited type in this framework: {framework}.
+4. If there are more than one risks, make sure each question is different and touches on different aspects of the novice's project.
+
 Start your response with "Here are some questions to consider:" before showing the questions.
-Questions should each be in a bullet point and a new paragraph, and each starting with the risk it belongs. Do not include any other information."""
+Questions should each be in a bullet point and a new paragraph. Do not include any other information.
+
+Project information:
+{information}
+
+Diagnosis:
+{diagnosis}
+
+Desired outcome:
+{outcome}
+"""
 
 coach_Q_prompt = ChatPromptTemplate.from_template(coach_Q_prompt_template)
 coach_question_chain = coach_Q_prompt | llm | StrOutputParser()
 
 # Prompt for summarizing 
 
-summary_prompt_template = """ You are a helpful assistant that summarizes all the content in the `information` blocks accurately into a single, less-than-30-word half-sentence that doesn't have subjects.
-    Do not make up any information or indicate anything if it is not provided. Make sure your summary maintains all the nuances.
-    Only return the summary and nothing else.
+summary_prompt_template = """ You are a helpful assistant that will simplify information in the `information` block into coherent, concise, half-sentence that doesn't have subjects.
+    Use simple and conversational language. Do not make up any information. 
+    Make sure to maintain all the nuanced context in the information.
+    Only return the half-sentence and nothing else.
     
     Information:
     {information} 

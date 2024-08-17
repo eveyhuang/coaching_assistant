@@ -93,9 +93,9 @@ if not filtered_dia_df.empty:
     tabs = st.tabs(tab_labels)
     for label, tab in zip(tab_labels, tabs):
         with tab:
-            st.checkbox(":gray-background[Risk: "+ dia_dict[label][0]+']', key=label)
+            st.checkbox(":gray-background["+ dia_dict[label][0]+']', key=label)
             st.markdown(":blue[**Question Asked:** "+dia_dict[label][1] + ']')
-            st.markdown(":green[**Your Response:** " +dia_dict[label][2] + ']')
+            st.markdown(":green[ **Your Response:**]" + ":green[ "+dia_dict[label][2] + ']')
 
     st.markdown('---')
     st.markdown('##### Other general risks to consider')
