@@ -12,8 +12,8 @@ proj_Questions = {
                "What specific aspects of your venture are you currently focusing on? And what you have been doing for the past two weeks to make progress on that?"],
     'learning':["The most useful and critical learning that the student has gained recently about any apsects of their venture, such as the problem, the effectiveness of their approach, or feedback from investors.",
                 "Is there any recent learning that has been extremely benefiical or critical for your venture?"],
-    'obstacles':["Whether the student is currently experiencing any obstacles that they could use some help on from their coach.", 
-                 "Are you currently experiencing any obstacles or roadblocks, or is there anything that is slowing you down?"],
+    'obstacles':["Whether the student is currently experiencing any thing like obstacles or roadblocks that are slowing them down.", 
+                 "Is there anything that is currently slowing you down?"],
     'planning':["Goals that the student plans to accomplish in the next few weeks to advance their project", 
                   "For the upcoming two weeks, what do you plan to accomplish to advance your project?"],
     'coaching_outcome':["Specific outcome that the student is looking to achieve through their next session with Brylan", 
@@ -72,7 +72,7 @@ class ProjectSchema(BaseModel):
 
     obstacles: Optional[str] = Field(
         None,
-        description="""Obstacles that the student is currently experiencing that they could use some help on from their coach.""",
+        description="""Any obstacles or roadblocks that are slowing the user down.""",
     )
 
     planning: Optional[str] = Field(

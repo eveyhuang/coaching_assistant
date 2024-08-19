@@ -269,11 +269,13 @@ if not filtered_dia_df.empty:
             st.session_state.coaching_goals = stu_risk
             risk_to_disucss['full_name'] = sel_stu
             risk_to_disucss['date'] = datetime.today().strftime('%Y-%m-%d')
-            # ref.child('coaches_notes').push().set(risk_to_disucss)
-            # st.write("Agenda saved! Thank you.")
+            
 
             questions = generate_Qs(ref_toshow.to_dict(), risk_to_disucss, st.session_state.coaching_goals)
-            st.markdown(questions)    
+            st.markdown(questions)
+            risk_to_disucss['questions'] = questions
+            ref.child('coaches_notes').push().set(risk_to_disucss)
+            st.write("Agenda saved! Thank you.")    
 
          
     
