@@ -275,7 +275,7 @@ if not filtered_dia_df.empty:
             st.markdown(questions)
             risk_to_disucss['questions'] = questions
             ref.child('coaches_notes').push().set(risk_to_disucss)
-            st.write("Agenda saved! Thank you.")    
+            # st.write("Agenda saved! Thank you.")    
 
          
     

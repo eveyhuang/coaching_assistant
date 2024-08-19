@@ -73,13 +73,14 @@ proj_question_chain = question_prompt | checkin_model | StrOutputParser()
 #prompt for generating questions coaches could ask
 coach_Q_prompt_template="""You are an experienced entrepreneur who is assisting the human user, an experienced coach to come up with questions to ask a novice entrepreneur during the next coaching session.
 Use information about the novice's project in the 'information' block as your context,
-for each risk in the 'diagnosis' block, generate one question that the coach could ask the novice to achieve the desired outcome in the 'outcome' block. 
+for each risk in the 'diagnosis' block, generate one question that the coach could ask the novice to achieve either the desired outcome in the 'outcome' block or the 'coaching_outcome' in the 'information' block.
 
 Requirements for your questions:
-1. Make sure the question is non-obvious (something that the novice has not considered before) based on project information and what has already been asked and answered in the diagnosis.
-2. Each question should use simple language, be concise, conversational, and hyper focused on something that the novice can do today.
-3. Make sure the question belongs to the best suited type in this framework: {framework}.
-4. If there are more than one risks, make sure each question is different and touches on different aspects of the novice's project.
+1. Make sure the question is tightly tied to the desired outcomes.
+2. Make sure the question is non-obvious (something that the novice has not considered before) based on project information and what has already been asked and answered in the diagnosis.
+3. Each question should use simple language, be concise, conversational, and hyper focused on something that the novice can do today.
+4. Make sure the question belongs to the best suited type in this framework: {framework}.
+5. If there are more than one risks, make sure each question is different and touches on different aspects of the novice's project.
 
 Start your response with "Here are some questions to consider:" before showing the questions.
 Questions should each be in a bullet point and a new paragraph. Do not include any other information.
