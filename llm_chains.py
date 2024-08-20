@@ -63,7 +63,7 @@ proj_quesion_prompt = """ You are a coaching asssitant that is helping the user 
     Formulate your question based on its description: {description}; and this example: {example}.
     If this thing is project_information, and that the 'previous_information' is not an empty string, 
     asks if the user is still working this project described in 'previous_information' and 
-    if they have updated anything about their market or product.
+    if so, is anything about their market or product has been updated since you last spoke.
     You should only ask about this one thing, ask one question at a time. 
     Do not make up any answers for the human. Wait for them to respond. 
     No need to give examples on possible answers. Keep your question concise and straight to the point.
