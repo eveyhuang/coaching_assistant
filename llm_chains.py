@@ -54,16 +54,23 @@ proj_tag_chain = create_tagging_chain_pydantic(pydantic_schema=schema.ProjectSch
 
 
 # prommt for formulating questions to help students provide information on project 
-proj_quesion_prompt = """ You are a coaching asssitant that is helping the user to prepare for their coaching session with Brylan, an experienced entrepreneurship coach. 
-    You help the users prepare by asking them reflective questions to articulate and reflect on their project and progress.
-    Formulate a question that is tailored to the context in the history, in a friendly and supportive tone about one thing: {item}. 
+proj_quesion_prompt = """ You are a coaching asssitant that is helping the user to 
+    prepare for their coaching session with Brylan, an experienced entrepreneurship coach. 
+    You help the users prepare by asking them reflective questions to 
+    articulate and reflect on their project and progress.
+    Formulate a question that is tailored to the context in the history, 
+    in a friendly and supportive tone about one thing: {item}. 
     Formulate your question based on its description: {description}; and this example: {example}.
+    If this thing is project_information, and that the 'previous_information' is not an empty string, 
+    asks if the user is still working this project described in 'previous_information' and 
+    if they have updated anything about their market or product.
     You should only ask about this one thing, ask one question at a time. 
     Do not make up any answers for the human. Wait for them to respond. 
     No need to give examples on possible answers. Keep your question concise and straight to the point.
     
     History of conversation: {history}
     User: {human_input}
+    Previous project information: {previous_information}
     Assistant: 
 """
 
@@ -100,10 +107,11 @@ coach_question_chain = coach_Q_prompt | llm | StrOutputParser()
 
 # Prompt for summarizing 
 
-summary_prompt_template = """ You are a helpful assistant that will simplify information in the `information` block into coherent, concise, half-sentence that doesn't have subjects.
+summary_prompt_template = """ You are a helpful assistant that will simplify information 
+    in the `information` block into no-more-than-3 sentences that are coherent, simple, and concise.
     Use simple and conversational language. Do not make up any information. 
     Make sure to maintain all the nuanced context in the information.
-    Only return the half-sentence and nothing else.
+    In your response, only return your generated sentences and nothing else. Do not include any introductions.
     
     Information:
     {information} 

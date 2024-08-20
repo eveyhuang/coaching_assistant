@@ -50,12 +50,11 @@ filtered_dia_df = diagnosis_df[(diagnosis_df['full_name']==sel_stu) & (diagnosis
 if not filtered_dia_df.empty:
     st.markdown('### ' + sel_stu)
 
-
     # section to display the most recent reflection
     st.markdown("#### Summary of your project information")
 
 
-    col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'coaching_outcome','emotions']
+    col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'coaching_outcome']
     # print("*****     shape of DF : ", filtered_ref_df.shape)
     try:
         ref_toshow = filtered_ref_df.iloc[:1][col].copy()

@@ -115,10 +115,10 @@ if not filtered_dia_df.empty:
 
     # section to display the most recent reflection
     st.markdown("#### Summary of Project Info")
-    ref_toshow = filtered_ref_df.iloc[:1][['project_information', 'process', 'learning', 'obstacles', 'planning', 'emotions']].copy()
+    ref_toshow = filtered_ref_df.iloc[:1][['project_information', 'process', 'learning', 'obstacles', 'planning']].copy()
 
 
-    col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'coaching_outcome','emotions']
+    col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'coaching_outcome']
     try:
         ref_toshow = filtered_ref_df.iloc[:1][col].copy()
     except:
@@ -273,6 +273,7 @@ if not filtered_dia_df.empty:
 
             questions = generate_Qs(ref_toshow.to_dict(), risk_to_disucss, st.session_state.coaching_goals)
             st.markdown(questions)
+            
             risk_to_disucss['questions'] = questions
             ref.child('coaches_notes').push().set(risk_to_disucss)
             # st.write("Agenda saved! Thank you.")    

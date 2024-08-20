@@ -44,11 +44,12 @@ checkin_schemas = {
 proj_question_chain = llm_chains.proj_question_chain
 
 # run LLM to formulate a question
-def ask_for_info(chain, history, human_input, previous_goal, item, description, example):
+def ask_for_info(chain, history, human_input, prev_info, item, description, example):
     retry_count = itertools.count()
+    
     while True:
         try:
-            question = chain.invoke({"history": history, "human_input":human_input, "previous_goal":previous_goal, "item": item, "description": description, "example":example})
+            question = chain.invoke({"history": history, "human_input":human_input, "previous_information":prev_info, "item": item, "description": description, "example":example})
             return question
         except:
             if next(retry_count) <= 5:
@@ -100,7 +101,7 @@ def filter_response(tagging_chain, text_input, user_details):
     # print("**  after tagging: ", res)
     user_details = add_non_empty_details(user_details, res)
 
-    # print("**** Newest user detail: ", user_details)
+    print("**** Newest user detail: ", user_details)
     ask_for = check_what_is_empty(user_details)
     # print("Remaining qs to ask for: ", ask_for)
     return user_details, ask_for
@@ -200,20 +201,25 @@ def diagnose(user_details):
     return diagnosis
 
 # retrieve a student's previous planning from firebase db
-def get_prevgoals(stu_name):
-    global prev_goal
+def get_prev_info(stu_name):
+    prev_info=''
     name = format_name(stu_name)
-    goal_ref = ref.child('check-in')
+    goal_ref = ref.child('check_in')
 
     # print("CALLING get_prevgoals with: " + name )
     snapshot = goal_ref.order_by_child('full_name').equal_to(name).limit_to_last(1).get()
         
     reflection = None
+    
     if snapshot:
+        print("snapshot ", snapshot.__dict__)
         for value in snapshot.items():
             reflection = value[1]
         if reflection:
-            prev_goal = reflection['planning']
+            prev_info = reflection['project_information']
+            print("Previous project information:    ", prev_info)
+    
+    return prev_info
 
 def getdetails(dict, item, pos):
     if item == 'full_name':
@@ -240,7 +246,7 @@ def get_progress(total_Q):
 
 
 if "messages" not in st.session_state:
-    question = "Hello, I am here to help you prepare for your next coaching session.  \n  \n I will ask you a series of questions to try to get a whole picture of your venture and your progress. Our conversation will be summarized and shown to your coach before your next session.  \n  \n To get started, please tell me your name and what your venture is about: what is the user problem or market needs you are trying to tackle, and what is your proposed solution?"
+    question = "Hello, I am here to help you prepare for your next coaching session.  \n  \n I will ask you a series of questions to try to get a whole picture of your venture and your progress. Our conversation will be summarized and shown to your coach before your next session.  \n  \n To get started, please tell me, what is your name?"
     st.session_state.messages = [{"role":"assistant", "content":question}]
     
 # default state should be reflections. but it can change    
@@ -272,13 +278,16 @@ if "prog" not in st.session_state:
 if "total_Q" not in st.session_state:
     st.session_state.total_Q = len(st.session_state.ask_for) + 4
 
+if "student_name" not in st.session_state:
+    st.session_state.student_name = ''
+
   
 if answer := st.chat_input("Please type your response here. "):
     # Add user message to chat history
     answer = answer.replace(';', '.')
     st.session_state.messages.append({"role": "user", "content": answer})
-    if "prev_goals" not in st.session_state:
-        st.session_state.prev_goals = ''
+    if "prev_info" not in st.session_state:
+        st.session_state.prev_info = get_prev_info(answer)
     # Display user message in chat message container
     with st.chat_message("user"):
         st.markdown(answer)
@@ -305,7 +314,7 @@ if answer := st.chat_input("Please type your response here. "):
                                                 question_chain,
                                                 st.session_state.messages[-3:],
                                                 answer,
-                                                prev_goal,
+                                                st.session_state.prev_info,
                                                 next_item,
                                                 getdetails(question_dict, next_item, 0),
                                                 getdetails(question_dict, next_item, 1))
@@ -349,7 +358,7 @@ if answer := st.chat_input("Please type your response here. "):
                 final_details = summarize_all_details(st.session_state.details)
                 final_details = final_details.dict()
                 print("Final details: ", final_details)
-                
+                st.session_state.student_name = final_details['full_name']
                 savedata(final_details, st.session_state.diagnosis_library, 'diagnosis')
                 savedata(final_details, final_details, 'check_in')
                 savedata(st.session_state.details.dict(), st.session_state.details.dict(), 'check_in_original' )
@@ -360,7 +369,7 @@ if answer := st.chat_input("Please type your response here. "):
                                  """
         prog_bar= st.progress(st.session_state.prog)
         st.session_state.prog = get_progress(st.session_state.total_Q)
-        prog_bar.progress(st.session_state.prog ) 
+        prog_bar.progress(st.session_state.prog) 
         for chunk in assistant_response.split():
             full_response += chunk + " "
             time.sleep(0.05)
