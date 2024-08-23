@@ -15,9 +15,10 @@ proj_Questions = {
     'obstacles':["Whether the student is currently experiencing any thing like obstacles or roadblocks that are slowing them down.", 
                  "Is there anything that is currently slowing you down?"],
     'planning':["Goals that the student plans to accomplish in the next few weeks", 
-                  "For the upcoming two weeks, what do you plan to accomplish?"],
+                  "What goals are you planning to accomplish in the next few weeks?"],
     'coaching_outcome':["Specific outcome that the student is looking to achieve through their next session with Brylan", 
                         "Looking ahead, what is a success metric that will make your next coaching session with Brylan worthwile to you? "],
+    'emotions':["emotions that the student is currently experiencing with their project, such as feeling stressed, excited, burnt out, etc.", "If you were being completely honest with me, how would you describe your feelings lately?"]
     }
 
 
@@ -83,10 +84,10 @@ class ProjectSchema(BaseModel):
         description="""Specific outcome that the student is looking to achieve through the upcoming coaching session with Brylan"""
     )
 
-    # emotions: Optional[str] = Field(
-    #     None,
-    #     description= """Any emotions that the student might be experiencing while working on their project, such as feeling stressed, motivated, discouraged, etc."""
-    # )
+    emotions: Optional[str] = Field(
+        None,
+        description= """Any emotions that the student might be experiencing while working on their project, such as feeling stressed, motivated, discouraged, etc."""
+    )
 
     # solution: Optional[str] = Field(
     #     None,

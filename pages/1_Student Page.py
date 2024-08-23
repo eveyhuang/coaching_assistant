@@ -54,7 +54,7 @@ if not filtered_dia_df.empty:
     st.markdown("#### Summary of your project information")
 
 
-    col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'coaching_outcome']
+    col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'coaching_outcome', 'emotions']
     # print("*****     shape of DF : ", filtered_ref_df.shape)
     try:
         ref_toshow = filtered_ref_df.iloc[:1][col].copy()

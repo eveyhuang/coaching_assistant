@@ -118,7 +118,7 @@ if not filtered_dia_df.empty:
     ref_toshow = filtered_ref_df.iloc[:1][['project_information', 'process', 'learning', 'obstacles', 'planning']].copy()
 
 
-    col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'coaching_outcome']
+    col= ['project_information', 'current_focus', 'learning', 'obstacles', 'planning', 'emotions', 'coaching_outcome']
     try:
         ref_toshow = filtered_ref_df.iloc[:1][col].copy()
     except:
