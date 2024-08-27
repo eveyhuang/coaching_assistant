@@ -130,25 +130,8 @@ summary_prompt_template = """ You are a helpful assistant that will simplify and
 """
 
 summary_prompt = ChatPromptTemplate.from_template(summary_prompt_template)
-# summary_model = ChatOpenAI(temperature=0, model="gpt-4")
-# openai_functions = [convert_pydantic_to_openai_function(schema.CoachingSchema)]
-# output_parser = PydanticOutputFunctionsParser(pydantic_schema=schema.CoachingSchema)
-# summary_chain = summary_prompt | coach_model.bind(functions=openai_functions) | output_parser
 summary_chain = summary_prompt | llm | StrOutputParser()
 
-
-summary_risk_template = """ You are a helpful and friendly assistant. 
-Start by saying that you have summarized the list of risks that you have diagnosed,
-then summarizes each of the risk and reasoning of the risk in `diagnosis` into one coherent sentence in supportive and friendly tone.
-Return these sentences into bullet points each in a new paragraph. 
-End by asking the user which one of the risk do they think is the most pressing and relevant. 
-
-{diagnosis}
-    Assistant: 
-"""
-
-summary_risk_prompt = ChatPromptTemplate.from_template(summary_risk_template)
-summary_risk_chain = summary_risk_prompt | llm | StrOutputParser()
 
 
 # Custom parser
@@ -204,15 +187,19 @@ format_instructions = output_parser.get_format_instructions()
 prompt = PromptTemplate(
     template="""You are a helpful thought partner that challenges novice entrepreneurs' 
         assumptions and help them identify possible risks that may make their products fail. 
-        Given all the information about the user in the 'input' block, and a list of common risks: {risk}
+        Given all the information about the user in the 'input' block, and a list of common risks provided in the 'risk' block.
         Use each of the risk to evaluate user input and diagnose the top three risks that are most relevant to the input and might be present. 
-        Explain your reasoning on your diagnosis using simple language and a speculative and friendly tone. 
+        Explain your reasoning on your diagnosis using simple, concise language and a speculative, friendly tone. 
         If the risk you identified is about having risky assumptions that are either not identified or validated, include a possible risky assumption in your reasoning. 
         Structure your output into json format using these keys: diagnosed_risks, reasoning_for_risks, questions_to_ask. follow format instruction: \n{format_instructions}
 
 <input>
 {input}
 </input>
+
+<risk>
+{risk}
+</risk>
 
 """,
     input_variables=["input", "risk"],
@@ -229,7 +216,7 @@ diag_qa_chain = (
         and you want to ask the user, a novice entrepreneur, insightful and deep questions to help them identify and prioritize risks, knowledge gaps, and unvalidated assumptions.
         In one sentence, explain to the user the possibility of this risk in a speculative and understanding tone: {risk}.
         Then ask these questions in a speculative and friendly tone: [{question}].
-        If and only if there is a question in the 'human_input' block, adds a one-sentence respond to the question at the beginning of your response. 
+        If and only if there is a question in the 'human_input' block, tell the user that it may be the best to bring up this question during the next coaching session. 
         Make sure to tailor your whole response to the context in the 'history' block, and replace names with the second pronoun. 
         Keep your whole response short, speculative, understanding, and friendly. 
         Only return the requested response.
