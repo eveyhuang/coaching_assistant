@@ -205,8 +205,9 @@ prompt = PromptTemplate(
     template="""You are a helpful thought partner that challenges novice entrepreneurs' 
         assumptions and help them identify possible risks that may make their products fail. 
         Given all the information about the user in the 'input' block, and a list of common risks: {risk}
-        Use each of the risk to evaluate user input and diganose the top three risks that are most relevant to the input and might be present. 
-        Explain your reasoning on your diagnosis. If the risk you identified is about having risky asusmptions that are either not identified or validated, include a possible risky assumption in your reasoning. 
+        Use each of the risk to evaluate user input and diagnose the top three risks that are most relevant to the input and might be present. 
+        Explain your reasoning on your diagnosis using simple language and a speculative and friendly tone. 
+        If the risk you identified is about having risky assumptions that are either not identified or validated, include a possible risky assumption in your reasoning. 
         Structure your output into json format using these keys: diagnosed_risks, reasoning_for_risks, questions_to_ask. follow format instruction: \n{format_instructions}
 
 <input>
@@ -226,9 +227,9 @@ diag_qa_chain = (
     PromptTemplate.from_template(
         """You are an experienced entrepreneur who deeply understands the fundamentals of entrepreneurship, 
         and you want to ask the user, a novice entrepreneur, insightful and deep questions to help them identify and prioritize risks, knowledge gaps, and unvalidated assumptions.
-        In one setence, explain to the user the possibility of this risk in a speculative and understanding tone: {risk}.
+        In one sentence, explain to the user the possibility of this risk in a speculative and understanding tone: {risk}.
         Then ask these questions in a speculative and friendly tone: [{question}].
-        If and only if there is a question in the 'human_input' block, adds a one-sentence respond to the question at the begining of your response. 
+        If and only if there is a question in the 'human_input' block, adds a one-sentence respond to the question at the beginning of your response. 
         Make sure to tailor your whole response to the context in the 'history' block, and replace names with the second pronoun. 
         Keep your whole response short, speculative, understanding, and friendly. 
         Only return the requested response.
