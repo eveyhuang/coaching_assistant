@@ -189,9 +189,11 @@ prompt = PromptTemplate(
         assumptions and help them identify possible risks that may make their products fail. 
         Given all the information about the user in the 'input' block, and a list of common risks provided in the 'risk' block.
         Use each of the risk to evaluate user input and diagnose the top three risks that are most relevant to the input and might be present. 
-        Explain your reasoning on your diagnosis using simple, concise language and a speculative, friendly tone. 
-        If the risk you identified is about having risky assumptions that are either not identified or validated, include a possible risky assumption in your reasoning. 
-        Structure your output into json format using these keys: diagnosed_risks, reasoning_for_risks, questions_to_ask. follow format instruction: \n{format_instructions}
+        Requirements:
+        (1) Make sure the three risks touch on different aspects and are not repetitive;
+        (2) Explain your reasoning on your diagnosis using simple, concise language and a speculative, friendly tone. 
+        (3) If the risk you identified is about having risky assumptions that are either not identified or validated, include a possible risky assumption in your reasoning. 
+        (4) Structure your output into json format using these keys: diagnosed_risks, reasoning_for_risks, questions_to_ask. follow format instruction: \n{format_instructions}
 
 <input>
 {input}
